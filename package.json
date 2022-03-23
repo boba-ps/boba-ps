@@ -1,0 +1,29 @@
+{
+  "name": "BobaPS-Rewrite",
+  "version": "1.0.0",
+  "description": "Rewritten version of BobaPS with better features",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "repository": "https://github.com/boba-ps/BobaPS-Rewrite",
+  "author": "quinella <98860103+quinelladesuu@users.noreply.github.com>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@typescript-eslint/eslint-plugin": "^5.15.0",
+    "@typescript-eslint/parser": "^5.15.0",
+    "eslint": "^8.11.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "dotenv": "^16.0.0",
+    "fastify": "^3.27.4",
+    "node-kcp": "^1.0.12",
+    "ts-node": "^10.7.0"
+  }
+}
