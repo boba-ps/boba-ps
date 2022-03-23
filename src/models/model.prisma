@@ -1,0 +1,14 @@
+datasource db {
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+model Users {
+    id Int @id @default(autoincrement())
+    email String @unique
+    username String @unique
+    password String @unique
+    gameUId Int @unique
+    gameUsername Int @unique
+    accountId Int @unique
+}
