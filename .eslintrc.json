@@ -19,6 +19,9 @@
         "import/prefer-default-export": "off",
         "import/extensions": "off",
         "no-plusplus": "off",
-        "no-bitwise": "off"
+        "no-bitwise": "off",
+        "default-case": "off",
+        "no-case-declarations": "off",
+        "no-underscore-dangle": "off"
     }
 }
