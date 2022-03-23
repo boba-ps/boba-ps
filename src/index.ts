@@ -5,6 +5,6 @@ import { Server } from './server/http/httpServer';
 config();
 
 (() => {
-  const httpServer = new Server(process.env.HOST ?? 'localhost', process.env.PORT as unknown as number ?? 8080);
+  const httpServer = new Server(process.env.HOST ?? 'localhost', process.env.PORT as unknown as number ?? 43);
   httpServer.start();
 })();
