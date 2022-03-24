@@ -33,36 +33,11 @@ export class Server {
     });
   }
 
-  private requestHandler() {
-    this.instance.addHook('onRequest', (req, res) => {
+  private async requestHandler() {
+    this.instance.addHook('onRequest', async (req, res) => {
       if (req.url.includes('favicon')) {
         res.code(404).send();
-      }
-
-      Log(req.url, LogTypes.Http);
-      res.send({ code: 0 });
-    });
-  }
-
-  private genshinHandler() {
-    this.instance.addHook('onRequest', (req, res) => {
-      try {
-        const file = readFileSync(`./genshin/${req.url.split('?')[0]}.json`);
-        Log(req.url.split('?')[0], LogTypes.Http);
-
-        res.header('Content-Type', 'text/html');
-        res.statusCode = 200;
-        const q:string = Buffer.from(file).toString();
-        res.send(q);
-      } catch (err) {
-        Warn(`[HTTP]: Url not found @ ${req.url}`, LogTypes.Http);
-      }
-    });
-  }
-
-  private queryCurHandler() {
-    this.instance.addHook('onRequest', async (req, res) => {
-      if (req.url.includes('query_cur_region')) {
+      } else if (req.url.includes('query_cur_region')) {
         res.header('Content-Type', 'text/html');
         res.statusCode = 200;
 
@@ -75,12 +50,22 @@ export class Server {
         const q:string = Buffer.from(await queryRegionList()).toString('base64');
         res.send(q);
       }
+
+      try {
+        const file = readFileSync(`./genshin/${req.url.split('?')[0]}.json`);
+        Log(req.url.split('?')[0], LogTypes.Http);
+
+        res.header('Content-Type', 'text/html');
+        res.statusCode = 200;
+        const q:string = Buffer.from(file).toString();
+        res.send(q);
+      } catch (err) {
+        Warn(`Url not found @ ${req.url}`, LogTypes.Http);
+      }
     });
   }
 
   start() {
-    this.genshinHandler();
-    this.queryCurHandler();
     this.requestHandler();
     // eslint-disable-next-line no-unused-vars
     this.instance.listen(this.port, (err, address) => {
