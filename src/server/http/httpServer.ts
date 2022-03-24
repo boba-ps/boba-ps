@@ -35,9 +35,11 @@ export class Server {
 
   private async requestHandler() {
     this.instance.addHook('onRequest', async (req, res) => {
-      if (req.url.includes('favicon')) {
-        res.code(404).send();
-      } else if (req.url.includes('query_cur_region')) {
+      Log(`Request received at ${req.url}`, LogTypes.Http);
+      const url = new URL(req.hostname);
+      Log(url.pathname, LogTypes.Http);
+
+      if (req.url.includes('query_cur_region')) {
         res.header('Content-Type', 'text/html');
         res.statusCode = 200;
 
@@ -49,6 +51,8 @@ export class Server {
 
         const q:string = Buffer.from(await queryRegionList()).toString('base64');
         res.send(q);
+      } else if (req.url.includes('favicon')) {
+        res.code(404).send();
       }
 
       try {
@@ -59,8 +63,11 @@ export class Server {
         res.statusCode = 200;
         const q:string = Buffer.from(file).toString();
         res.send(q);
-      } catch (err) {
+      } catch (e) {
         Warn(`Url not found @ ${req.url}`, LogTypes.Http);
+        res.statusCode = 200;
+        res.header('Content-Type', 'text/html');
+        res.send({ code: 0 });
       }
     });
   }

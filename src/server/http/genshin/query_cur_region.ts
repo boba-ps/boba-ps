@@ -5,7 +5,7 @@ import cur from './cur.json';
 export default async () => {
   const queryRegionList = cur['2.1'][2];
   const root = protobuf.load(
-    '../../../utils/protos/QueryCurrRegionHttpRsp.proto',
+    './src/utils/protos/QueryCurrRegionHttpRsp.proto',
   );
   const testMessage = (await root!).lookupType(
     'QueryCurrRegionHttpRsp',
