@@ -1,0 +1,27 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "id": 6,
+        "game_key": "hk4e_global",
+        "client": "PC",
+        "identity": "I_IDENTITY",
+        "guest": false,
+        "ignore_versions": "",
+        "scene": "S_NORMAL",
+        "name": "原神海外",
+        "disable_regist": false,
+        "enable_email_captcha": false,
+        "thirdparty": [
+            "fb",
+            "tw"
+        ],
+        "disable_mmt": false,
+        "server_guest": false,
+        "thirdparty_ignore": {
+            "tw": "",
+            "fb": ""
+        },
+        "enable_ps_bind_account": false
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "id": "none",
+        "action": "ACTION_NONE",
+        "geetest": null
+    }
+}

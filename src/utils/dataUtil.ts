@@ -1,9 +1,11 @@
+import kcp from 'node-kcp';
 /* eslint-disable max-len */
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
 import protobuf from 'protobufjs';
 import packetIds from './packetIds/packetIds.json';
 import { Err, Log, LogTypes } from './logging';
+import { Packet } from './packet';
 
 const pIds = packetIds as { [packetIds: string]: string };
 
@@ -138,6 +140,11 @@ export const formatPacket = async (data: Buffer, token: number) => {
   }
   return msgs;
 };
+export const objToPacket = async (obj: Object, protoName: string, kcpobj: kcp.KCP) => new Packet(
+    (await objToProtoBuffer(obj, protoName)) as Buffer,
+    protoName,
+    kcpobj,
+);
 
 export const isValidPacket = (data: Buffer) => (
   data.length > 5

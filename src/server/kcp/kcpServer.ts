@@ -5,7 +5,10 @@ import { Warn, Log, LogTypes } from '../../utils/logging';
 /* eslint-disable no-shadow */
 /* eslint-disable import/no-unresolved */
 import { Handshake } from '../../utils/handshake';
+import * as dataUtil from '../../utils/dataUtil';
 
+// external handlers
+export const udpServer = createSocket('udp4');
 export class kcpServer {
   public port!:number;
 
@@ -21,7 +24,7 @@ export class kcpServer {
 
   constructor(port:number) {
     this.port = port;
-    this.server = createSocket('udp4');
+    this.server = udpServer;
   }
 
   handleHandshake(data:any, type:number) {
@@ -38,10 +41,7 @@ export class kcpServer {
 
         return newBuf;
       case 404:
-        // im gonna do this tomorrow
-        // @ts-expect-error
-        // eslint-disable-next-line no-use-before-define
-        const handshake = new Handshake(handshake.MAGIC_DISCONNECT);
+        const handshake = new Handshake([0x194, 0x19419494]);
 
         this.seedKey = undefined;
 
@@ -49,5 +49,17 @@ export class kcpServer {
       default:
         Warn(`Unhandled handshake ${type}`, LogTypes.KCP);
     }
+  }
+
+  async output(data: Buffer, size: number, context: any) {
+    if (data === undefined || data === null) return;
+    if (data.length > 26) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const k of await dataUtil.formatPacket(data, this.token)) {
+        this.server.send(k, 0, k.length, context.port, context.address);
+      }
+      return;
+    }
+    this.server.send(data, 0, size, context.port, context.address);
   }
 }

@@ -1,10 +1,14 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable max-len */
 import { fastify, FastifyInstance, FastifyLoggerInstance } from 'fastify';
 import { readFileSync } from 'fs';
 import { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from 'http2';
 import path from 'path';
-// eslint-disable-next-line import/no-unresolved
-import { Err, Log, LogTypes } from '../../utils/logging';
+import {
+  Err, Log, LogTypes, Warn,
+} from '../../utils/logging';
+import queryCurRegion from './genshin/query_cur_region';
+import queryRegionList from './genshin/query_region_list';
 /* eslint-disable class-methods-use-this */
 
 export class Server {
@@ -35,11 +39,48 @@ export class Server {
         res.code(404).send();
       }
 
+      Log(req.url, LogTypes.Http);
       res.send({ code: 0 });
     });
   }
 
+  private genshinHandler() {
+    this.instance.addHook('onRequest', (req, res) => {
+      try {
+        const file = readFileSync(`./genshin/${req.url.split('?')[0]}.json`);
+        Log(req.url.split('?')[0], LogTypes.Http);
+
+        res.header('Content-Type', 'text/html');
+        res.statusCode = 200;
+        const q:string = Buffer.from(file).toString();
+        res.send(q);
+      } catch (err) {
+        Warn(`[HTTP]: Url not found @ ${req.url}`, LogTypes.Http);
+      }
+    });
+  }
+
+  private queryCurHandler() {
+    this.instance.addHook('onRequest', async (req, res) => {
+      if (req.url.includes('query_cur_region')) {
+        res.header('Content-Type', 'text/html');
+        res.statusCode = 200;
+
+        const q:string = Buffer.from(await queryCurRegion()).toString('base64');
+        res.send(q);
+      } else if (req.url.includes('query_region_list')) {
+        res.header('Content-Type', 'text/html');
+        res.statusCode = 200;
+
+        const q:string = Buffer.from(await queryRegionList()).toString('base64');
+        res.send(q);
+      }
+    });
+  }
+
   start() {
+    this.genshinHandler();
+    this.queryCurHandler();
     this.requestHandler();
     // eslint-disable-next-line no-unused-vars
     this.instance.listen(this.port, (err, address) => {

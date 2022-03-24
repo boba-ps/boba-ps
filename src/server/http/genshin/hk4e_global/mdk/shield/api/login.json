@@ -1,0 +1,31 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "account": {
+            "uid": "666",
+            "name": "",
+            "email": "Running On BobaPS v1.0",
+            "mobile": "",
+            "is_email_verify": "0",
+            "realname": "",
+            "identity_card": "",
+            "token": "",
+            "safe_mobile": "",
+            "facebook_name": "",
+            "google_name": "",
+            "twitter_name": "",
+            "game_center_name": "",
+            "apple_name": "",
+            "sony_name": "",
+            "tap_name": "",
+            "country": "MX",
+            "reactivate_ticket": "",
+            "area_code": "**"
+        },
+        "device_grant_required": false,
+        "safe_moblie_required": false,
+        "realperson_required": false,
+        "reactivate_required": false
+    }
+}

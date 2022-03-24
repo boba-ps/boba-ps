@@ -1,0 +1,17 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "list": [
+            {
+                "ann_id": 1250,
+                "title": "<b>Welcome to BobaPS!</b>",
+                "subtitle": "<b>bobaPS is absolutely winning...</b>",
+                "banner": "placeholder.png",
+                "content": "made by na.na and quinella!!",
+                "lang": "en-us"
+            }
+        ],
+        "total": 1
+    }
+}

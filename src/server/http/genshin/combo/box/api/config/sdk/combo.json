@@ -1,0 +1,11 @@
+{
+    "retcode": 0,
+    "message": "OK",
+    "data": {
+        "vals": {
+            "email_bind_remind": "true",
+            "disable_email_bind_skip": "false",
+            "email_bind_remind_interval": "7"
+        }
+    }
+}
