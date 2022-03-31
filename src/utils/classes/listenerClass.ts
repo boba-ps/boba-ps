@@ -2,6 +2,8 @@
 import { Socket } from 'dgram';
 import { KCP } from 'node-kcp';
 // eslint-disable-next-line import/no-unresolved
+import { Packet } from '../packet';
+// eslint-disable-next-line import/no-unresolved
 import { udpServer } from '../../server/kcp/kcpServer';
 // this is to make a listener class template
 
@@ -22,9 +24,9 @@ export default class {
 
   serverInstance!:Socket;
 
-  data!:Buffer;
+  data!:Packet;
 
-  constructor(protoName:string, packetId:string|number, data:Buffer, kcpObject:KCP) {
+  constructor(protoName:string, packetId:string|number, data:Packet, kcpObject:KCP) {
     this.protoName = protoName;
     this.packetId = packetId;
     this.kcpObject = kcpObject;
@@ -34,5 +36,5 @@ export default class {
 
   // eslint-disable-next-line max-len
   // eslint-disable-next-line class-methods-use-this
-  exec(handler:() => void) { return handler; }
+  exec() : void {}
 }

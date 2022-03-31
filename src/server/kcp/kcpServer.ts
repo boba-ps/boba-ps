@@ -27,6 +27,8 @@ export let currentKcpObj:KCP | undefined;
 export let currentData:Buffer | undefined;
 export let currentToken:number = 0x0;
 export let currentPacket:Packet;
+export let currentXorBlob:any;
+
 export class kcpServer {
   public port!:number;
 
@@ -106,6 +108,7 @@ export class kcpServer {
       const recv = kcpObj.recv();
       if (recv) {
         const xorBlob = kcpServer.initialKeyBlob || kcpServer.keyBlob;
+        currentXorBlob = xorBlob;
         const decryptedData = dataUtil.xorData(recv, xorBlob);
 
         if (dataUtil.isValidPacket(decryptedData)) {
