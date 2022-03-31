@@ -28,7 +28,7 @@ export default class {
   // eslint-disable-next-line class-methods-use-this
   async init() {
     const listeners = readdirSync(p.join(__dirname, '..', '/listeners/'));
-    this.serverInstance.on('message', (msg:Buffer, rinfo:RemoteInfo) => {
+    this.serverInstance.addListener('message', (msg:Buffer, rinfo:RemoteInfo) => {
       // eslint-disable-next-line guard-for-in
       for (const listener in listeners) {
         (async () => {

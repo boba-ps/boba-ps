@@ -12,21 +12,24 @@ export enum protoTypes {
     Notify = 'Notify'
 }
 export default class {
-  protoName!:string;
+  protoName!:string[] | string;
 
   protoType!:protoTypes;
 
-  packetId!:string | number;
+  packetId!:string[] | number[] | string | number;
 
   kcpObject!: KCP;
 
   serverInstance!:Socket;
 
-  constructor(protoName:string, packetId:string|number, kcpObject:KCP) {
+  data!:Buffer;
+
+  constructor(protoName:string, packetId:string|number, data:Buffer, kcpObject:KCP) {
     this.protoName = protoName;
     this.packetId = packetId;
     this.kcpObject = kcpObject;
     this.serverInstance = udpServer;
+    this.data = data;
   }
 
   // eslint-disable-next-line max-len
