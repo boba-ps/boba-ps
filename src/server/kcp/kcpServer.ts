@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable new-cap */
 /* eslint-disable prefer-const */
 /* eslint-disable import/no-mutable-exports */
 /* eslint-disable class-methods-use-this */
@@ -7,13 +9,16 @@ import { createSocket, Socket, RemoteInfo } from 'dgram';
 import { KCP } from 'node-kcp';
 // eslint-disable-next-line import/no-unresolved
 import { Packet } from '../../utils/packet';
+import {
+  Warn, Log, LogTypes, Err,
 // eslint-disable-next-line import/no-unresolved
-import { Warn, Log, LogTypes } from '../../utils/logging';
+} from '../../utils/logging';
 /* eslint-disable consistent-return */
 /* eslint-disable no-shadow */
 /* eslint-disable import/no-unresolved */
 import { Handshake } from '../../utils/handshake';
 import * as dataUtil from '../../utils/dataUtil';
+import listenerHandler from './handlers/listenerHandler';
 
 // external handlers
 export const udpServer = createSocket('udp4');
@@ -40,10 +45,15 @@ export class kcpServer {
 
   static keyBlob: Buffer | undefined = undefined;
 
+  public host!:string;
+
   private seedKey!:any;
 
+  private _activeClient!:string;
+
   clients:{[key:string]: any} = {};
-  constructor(port:number) {
+  constructor(port:number, host:string) {
+    this.host = host;
     this.port = port;
     this.server = udpServer;
   }
@@ -86,6 +96,7 @@ export class kcpServer {
   async onMessage(msg:Buffer, rinfo:RemoteInfo) {
     const activeClient:string = `${rinfo.address}_${rinfo.port}_${msg.readUint32LE(0).toString(16)}`;
     const buffer = Buffer.from(msg);
+    this._activeClient = activeClient;
     if (msg.byteLength <= 20) {
       const ret = this.handleHandshake(buffer, buffer.readInt32BE(0));
       ret?.encode();
@@ -122,5 +133,24 @@ export class kcpServer {
         }
       }
     }
+  }
+
+  async start() {
+    this.server.bind(this.port, this.host);
+
+    this.server.on('listening', async () => {
+      this.server.address();
+      Log(`KCP Server is listening at port ${this.port}`, LogTypes.KCP);
+      const _listenerHandler = new listenerHandler(currentKcpObj ?? this.clients.activeClient, kcpServer.initialKeyBlob ?? kcpServer.keyBlob);
+      await _listenerHandler.init();
+    });
+
+    this.server.on('message', async (msg, rinfo) => {
+      await this.onMessage(msg, rinfo);
+    });
+
+    this.server.on('error', (e) => {
+      Err(e.message, LogTypes.KCP);
+    });
   }
 }
