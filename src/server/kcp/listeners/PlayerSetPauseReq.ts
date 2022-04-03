@@ -12,7 +12,7 @@ class PlayerSetPauseReq extends listenerClass {
   async exec() {
     await this.data.setProtobuf();
     const rsp = {
-      retcode: 0
+      retcode: 0,
     };
     sendPacket(await convToPacket('PlayerSetPauseRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
   }

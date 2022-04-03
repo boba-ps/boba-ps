@@ -8,44 +8,42 @@ class PlayerLoginReq extends listenerClass {
   constructor() {
     super('PlayerLoginReq', getPacketIdByProtoName('PlayerLoginReq'), currentPacket, currentKcpObj!);
   }
-    // Login Sequence Needed Packets
-    //      There's probably more too, can't test
-    //      Probably not in order, can't test either
-    //
-    // AvatarDataNotify
-    // ActivityScheduleInfoNotify
-    // PlayerPropNotify
-    // PlayerDataNotify
-    // AchievementUpdateNotify
-    // OpenStateUpdateNotify
-    // PlayerStoreNotify
-    // AvatarSatiationDataNotify
-    // RegionSearchNotify
-    // PlayerEnterSceneNotify
-    // PlayerLoginRsp
+  // Login Sequence Needed Packets
+  //      There's probably more too, can't test
+  //      Probably not in order, can't test either
+  //
+  // AvatarDataNotify
+  // ActivityScheduleInfoNotify
+  // PlayerPropNotify
+  // PlayerDataNotify
+  // AchievementUpdateNotify
+  // OpenStateUpdateNotify
+  // PlayerStoreNotify
+  // AvatarSatiationDataNotify
+  // RegionSearchNotify
+  // PlayerEnterSceneNotify
+  // PlayerLoginRsp
 
-
-    // PlayerLoginReq passed info: (Client -> Server)
-    // token
-    // clientVersion
-    // systemVersion
-    // deviceName
-    // deviceUuid
-    // languageType
-    // accountType
-    // deviceInfo
-    // platformType
-    // checksum
-    // securityCmdReply (buffer)
-    // cps (?)
-    // checksumClientVersion
-    // clientDataVersion
-    // clientVersionHash
+  // PlayerLoginReq passed info: (Client -> Server)
+  // token
+  // clientVersion
+  // systemVersion
+  // deviceName
+  // deviceUuid
+  // languageType
+  // accountType
+  // deviceInfo
+  // platformType
+  // checksum
+  // securityCmdReply (buffer)
+  // cps (?)
+  // checksumClientVersion
+  // clientDataVersion
+  // clientVersionHash
 
   async exec() {
     await this.data.setProtobuf();
 
-    
     const rsp = {
       // I cannot get playerloginrsp content. It doesn't want to decode :sob:
     };

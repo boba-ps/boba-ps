@@ -13,7 +13,7 @@ class SetPlayerSignatureReq extends listenerClass {
     await this.data.setProtobuf();
     const rsp = {
       retcode: 0,
-      signature: this.data.protoBuf.signature
+      signature: this.data.protoBuf.signature,
     };
     sendPacket(await convToPacket('SetPlayerSignatureRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
   }

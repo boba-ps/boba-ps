@@ -12,8 +12,8 @@ class PingReq extends listenerClass {
   async exec() {
     await this.data.setProtobuf();
     const rsp = {
-      clientTime: this.data.protoBuf["clientTime"],
-      ueTime: this.data.protoBuf["ueTime"]
+      clientTime: this.data.protoBuf.clientTime,
+      ueTime: this.data.protoBuf.ueTime,
     };
     sendPacket(await convToPacket('PingRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
   }

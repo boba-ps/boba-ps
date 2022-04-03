@@ -14,8 +14,8 @@ class SetPlayerHeadImageReq extends listenerClass {
     const rsp = {
       avatarId: this.data.protoBuf.avatarId,
       profilePicture: {
-        avatarId: this.data.protoBuf.avatarId
-      }
+        avatarId: this.data.protoBuf.avatarId,
+      },
     };
     sendPacket(await convToPacket('SetPlayerHeadImageRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
   }

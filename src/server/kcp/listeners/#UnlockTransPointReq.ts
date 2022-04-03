@@ -11,7 +11,7 @@ class UnlockTransPointReq extends listenerClass {
 
   // Unlock Transport Point Needed Packets
   //    Probably not in order, can't test
-  // 
+  //
   // ScenePointUnlockNotify <- this does not get called nowhere else, afaik
   // UnlockTransPointRsp
 
@@ -19,7 +19,8 @@ class UnlockTransPointReq extends listenerClass {
     await this.data.setProtobuf();
     const rsp = {
       sceneId: 3, // Is this constant? I'm not sure, I think it's hardcoded...
-      pointId: parseInt(this.data.protoBuf.pointId)
+      // eslint-disable-next-line radix
+      pointId: parseInt(this.data.protoBuf.pointId),
     };
     sendPacket(await convToPacket('UnlockTransPointRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
   }
