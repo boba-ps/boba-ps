@@ -9,7 +9,7 @@ generator client {
 
 model AvatarFightProp {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     prop_id Int
     value Int
 }
@@ -18,13 +18,13 @@ model AvatarInfo {
     id Int @id @default(autoincrement())
     uid Int 
     character_id Int
-    guid Int
+    guid Int?
     born_time Int
 }
 
 model AvatarProp {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     prop_id Int
     prop_value Int
 }
@@ -39,7 +39,7 @@ model AvatarTeamInfo {
     id Int @id @default(autoincrement())
     uid Int
     team_id Int
-    guid Int
+    guid Int?
 }
 
 model AvatarWeapon {
@@ -50,7 +50,7 @@ model AvatarWeapon {
 
 model EquipInfo {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     is_locked Boolean
     level Int
     exp Int
@@ -59,20 +59,20 @@ model EquipInfo {
 
 model FurnitureInfo {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     count Int
 }
 
 model ItemInfo {
     id Int @id @default(autoincrement())
     uid Int
-    guid Int
+    guid Int?
     item_id Int
 }
 
 model MaterialInfo {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     count Int
     has_delete_config Boolean
 }
@@ -106,13 +106,13 @@ model PlayerProp {
 
 model ReliquaryInfo {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     main_prop_id Int
 }
 
 model ReliquaryProp {
     id Int @id @default(autoincrement())
-    guid Int
+    guid Int?
     prop_id Int
 }
 
@@ -129,7 +129,7 @@ model SceneInfo {
 model TeamInfo {
     id Int @id @default(autoincrement())
     uid Int
-    oid Int
+    oid Int?
     name String
 }
 

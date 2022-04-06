@@ -1,5 +1,5 @@
 export interface AvatarFightProp {
-    guid:number,
+    guid?:number,
     prop_id:number,
     value:number
 }
@@ -12,20 +12,20 @@ export interface AvatarInfo {
 }
 
 export interface AvatarProp {
-    guid:number,
+    guid?:number,
     prop_id:number,
     prop_value:number,
 }
 
 export interface AvatarReliquary {
-    avatar_guid:number,
+    avatar_guid?:number,
     reliquary_guid:number,
 }
 
 export interface AvatarTeamInfo {
     uid:number,
     team_id:number,
-    guid:number,
+    guid?:number,
 }
 
 export interface AvatarWeapon {
@@ -34,7 +34,7 @@ export interface AvatarWeapon {
 }
 
 export interface EquipInfo {
-    guid:number,
+    guid?:number,
     is_locked:boolean,
     level:number,
     exp:number,
@@ -42,18 +42,18 @@ export interface EquipInfo {
 }
 
 export interface FurnitureInfo {
-    guid:number,
+    guid?:number,
     count:number
 }
 
 export interface ItemInfo {
     uid:number,
-    guid:number,
+    guid?:number,
     item_id:number,
 }
 
 export interface MaterialInfo {
-    guid:number,
+    guid?:number,
     count:number,
     has_delete_config:boolean,
 }
@@ -83,12 +83,12 @@ export interface PlayerProp {
 }
 
 export interface ReliquaryInfo {
-    guid:number
+    guid?:number
     main_prop_id:number
 }
 
 export interface ReliquaryProp {
-    guid:number
+    guid?:number
     prop_id:number
 }
 
@@ -103,7 +103,7 @@ export interface SceneInfo {
 
 export interface TeamInfo {
     uid:number
-    oid:number
+    oid?:number
     name:string
 }
 
