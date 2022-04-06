@@ -1,21 +1,19 @@
+import { config } from 'dotenv';
 /* eslint-disable max-len */
 /* eslint-disable new-cap */
 /* eslint-disable prefer-const */
 /* eslint-disable import/no-mutable-exports */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable lines-between-class-members */
-import { createSocket, Socket, RemoteInfo } from 'dgram';
-// eslint-disable-next-line import/no-unresolved
-import { KCP } from 'node-kcp';
-// eslint-disable-next-line import/no-unresolved
-import { Packet } from '../../utils/packet';
-import {
-  Warn, Log, LogTypes, Err,
-// eslint-disable-next-line import/no-unresolved
-} from '../../utils/logging';
 /* eslint-disable consistent-return */
 /* eslint-disable no-shadow */
 /* eslint-disable import/no-unresolved */
+import { createSocket, Socket, RemoteInfo } from 'dgram';
+import { KCP } from 'node-kcp';
+import { Packet } from '../../utils/packet';
+import {
+  Warn, Log, LogTypes, Err,
+} from '../../utils/logging';
 import { Handshake } from '../../utils/handshake';
 import * as dataUtil from '../../utils/dataUtil';
 import listenerHandler from './handlers/listenerHandler';
@@ -28,11 +26,6 @@ export interface context {
   port: number
 }
 export const getKcpObj = (data:Buffer, ctx:context) => new KCP(data.readUInt32LE(0), ctx);
-export let currentKcpObj:KCP | undefined;
-export let currentData:Buffer | undefined;
-export let currentToken:number = 0x0;
-export let currentPacket:Packet;
-export let currentXorBlob:any;
 
 export class kcpServer {
   public port!:number;
@@ -46,6 +39,14 @@ export class kcpServer {
   static keyBlob: Buffer | undefined = undefined;
 
   public host!:string;
+
+  public currentKcpObj:KCP | undefined;
+
+  public currentData:Buffer | undefined;
+
+  public currentXorBlob:any;
+
+  public currentPacket:Packet | undefined;
 
   private seedKey!:any;
 
@@ -106,12 +107,13 @@ export class kcpServer {
     }
     if (this.clients[activeClient] === undefined) {
       const kcpObj = getKcpObj(msg, { address: rinfo.address, port: rinfo.port });
+
       kcpObj.nodelay(1, 10, 2, 1);
       kcpObj.output(this.output);
-      currentKcpObj = kcpObj;
+      this.currentKcpObj = kcpObj;
+
       this.clients[activeClient] = kcpObj;
       this.token = msg.readUint32BE(4);
-      currentToken = this.token;
       const formattedPacket = dataUtil.reformatKcpPacket(msg);
       kcpObj.input(formattedPacket);
       kcpObj.update(Date.now());
@@ -119,7 +121,7 @@ export class kcpServer {
       const recv = kcpObj.recv();
       if (recv) {
         const xorBlob = kcpServer.initialKeyBlob || kcpServer.keyBlob;
-        currentXorBlob = xorBlob;
+        this.currentXorBlob = xorBlob;
         const decryptedData = dataUtil.xorData(recv, xorBlob);
 
         if (dataUtil.isValidPacket(decryptedData)) {
@@ -128,7 +130,7 @@ export class kcpServer {
             decryptedData.readUInt16BE(2),
             kcpObj,
           );
-          currentPacket = packet;
+          this.currentPacket = packet;
           if (packet.protoName !== undefined) await packet.setProtobuf();
         }
       }
@@ -141,7 +143,7 @@ export class kcpServer {
     this.server.on('listening', async () => {
       this.server.address();
       Log(`KCP Server is listening at port ${this.port}`, LogTypes.KCP);
-      const _listenerHandler = new listenerHandler(currentKcpObj ?? this.clients.activeClient, kcpServer.initialKeyBlob ?? kcpServer.keyBlob);
+      const _listenerHandler = new listenerHandler(this.currentKcpObj ?? this.clients.activeClient, kcpServer.initialKeyBlob ?? kcpServer.keyBlob);
       await _listenerHandler.init();
     });
 
@@ -154,3 +156,7 @@ export class kcpServer {
     });
   }
 }
+
+config();
+
+export const KcpServer = new kcpServer(Number(process.env.KCP_PORT) ?? 22102, process.env.HOST ?? 'localhost');
