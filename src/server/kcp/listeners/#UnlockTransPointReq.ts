@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class UnlockTransPointReq extends listenerClass {
   constructor() {
-    super('UnlockTransPointReq', getPacketIdByProtoName('UnlockTransPointReq'), currentPacket, currentKcpObj!);
+    super('UnlockTransPointReq', getPacketIdByProtoName('UnlockTransPointReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   // Unlock Transport Point Needed Packets
@@ -22,7 +22,7 @@ class UnlockTransPointReq extends listenerClass {
       // eslint-disable-next-line radix
       pointId: parseInt(this.data.protoBuf.pointId),
     };
-    sendPacket(await convToPacket('UnlockTransPointRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('UnlockTransPointRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

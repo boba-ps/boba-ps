@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class GetPlayerTokenReq extends listenerClass {
   constructor() {
-    super('GetPlayerTokenReq', getPacketIdByProtoName('GetPlayerToken'), currentPacket, currentKcpObj!);
+    super('GetPlayerTokenReq', getPacketIdByProtoName('GetPlayerToken'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   async exec() {
@@ -15,7 +15,7 @@ class GetPlayerTokenReq extends listenerClass {
       secretKeySeed: 2,
       accountUid: this.data.protoBuf.accountUid,
     };
-    sendPacket(await convToPacket('GetPlayerTokenRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('GetPlayerTokenRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

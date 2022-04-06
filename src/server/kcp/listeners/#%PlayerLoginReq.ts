@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class PlayerLoginReq extends listenerClass {
   constructor() {
-    super('PlayerLoginReq', getPacketIdByProtoName('PlayerLoginReq'), currentPacket, currentKcpObj!);
+    super('PlayerLoginReq', getPacketIdByProtoName('PlayerLoginReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
   // Login Sequence Needed Packets
   //      There's probably more too, can't test
@@ -47,7 +47,7 @@ class PlayerLoginReq extends listenerClass {
     const rsp = {
       // I cannot get playerloginrsp content. It doesn't want to decode :sob:
     };
-    sendPacket(await convToPacket('PlayerLoginRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('PlayerLoginRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

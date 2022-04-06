@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class MarkMapReq extends listenerClass {
   constructor() {
-    super('MarkMapReq', getPacketIdByProtoName('MarkMapReq'), currentPacket, currentKcpObj!);
+    super('MarkMapReq', getPacketIdByProtoName('MarkMapReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
   // MarkMap Needed Packets
   //      I'm sure there's more, but can't test
@@ -25,7 +25,7 @@ class MarkMapReq extends listenerClass {
     const rsp = {
 
     };
-    sendPacket(await convToPacket('MarkMapRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('MarkMapRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

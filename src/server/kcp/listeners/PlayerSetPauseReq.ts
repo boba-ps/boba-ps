@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class PlayerSetPauseReq extends listenerClass {
   constructor() {
-    super('PlayerSetPauseReq', getPacketIdByProtoName('PlayerSetPauseReq'), currentPacket, currentKcpObj!);
+    super('PlayerSetPauseReq', getPacketIdByProtoName('PlayerSetPauseReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   async exec() {
@@ -14,7 +14,7 @@ class PlayerSetPauseReq extends listenerClass {
     const rsp = {
       retcode: 0,
     };
-    sendPacket(await convToPacket('PlayerSetPauseRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('PlayerSetPauseRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class PingReq extends listenerClass {
   constructor() {
-    super('PingReq', getPacketIdByProtoName('PingReq'), currentPacket, currentKcpObj!);
+    super('PingReq', getPacketIdByProtoName('PingReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   async exec() {
@@ -15,7 +15,7 @@ class PingReq extends listenerClass {
       clientTime: this.data.protoBuf.clientTime,
       ueTime: this.data.protoBuf.ueTime,
     };
-    sendPacket(await convToPacket('PingRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('PingRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

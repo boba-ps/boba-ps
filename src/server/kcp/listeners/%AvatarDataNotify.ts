@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class AvatarDataNotify extends listenerClass {
   constructor() {
-    super('AvatarDataNotify', getPacketIdByProtoName('AvatarDataNotify'), currentPacket, currentKcpObj!);
+    super('AvatarDataNotify', getPacketIdByProtoName('AvatarDataNotify'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   // AvatarDataNotify passed info: (Server -> Client)
@@ -80,7 +80,7 @@ class AvatarDataNotify extends listenerClass {
         unsigned: true,
       },
     };
-    sendPacket(await convToPacket('AvatarDataNotify', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('AvatarDataNotify', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 

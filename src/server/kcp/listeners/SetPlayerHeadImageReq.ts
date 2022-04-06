@@ -1,12 +1,12 @@
 /* eslint-disable import/no-unresolved */
-import { currentXorBlob, currentKcpObj, currentPacket } from '../kcpServer';
+import { KcpServer } from '../kcpServer';
 import { convToPacket, sendPacket } from '../../../utils/packetUtils';
 import { getPacketIdByProtoName } from '../../../utils/dataUtil';
 import listenerClass from '../../../utils/classes/listenerClass';
 
 class SetPlayerHeadImageReq extends listenerClass {
   constructor() {
-    super('SetPlayerHeadImageReq', getPacketIdByProtoName('SetPlayerHeadImageReq'), currentPacket, currentKcpObj!);
+    super('SetPlayerHeadImageReq', getPacketIdByProtoName('SetPlayerHeadImageReq'), KcpServer.currentPacket!, KcpServer.currentKcpObj!);
   }
 
   async exec() {
@@ -17,7 +17,7 @@ class SetPlayerHeadImageReq extends listenerClass {
         avatarId: this.data.protoBuf.avatarId,
       },
     };
-    sendPacket(await convToPacket('SetPlayerHeadImageRsp', this.kcpObject, rsp), currentXorBlob, currentXorBlob);
+    sendPacket(await convToPacket('SetPlayerHeadImageRsp', this.kcpObject, rsp), KcpServer.currentXorBlob, KcpServer.currentXorBlob);
   }
 }
 
