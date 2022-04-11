@@ -1,32 +1,44 @@
-// TO DO: try-catch incase error
+/* eslint-disable import/no-unresolved */
 import { PrismaClient } from '@prisma/client';
-// eslint-disable-next-line import/no-unresolved
+import { GetPlayerTokenReq } from './definitions/GetPlayerTokenReq';
 import { PlayerInfo } from './interfaces';
+import { Log, LogTypes } from './logging';
+import { Packet } from './packet';
 
 export const prismaClient = new PrismaClient();
 
-export const createPlrData = (plrData:PlayerInfo) => {
-  prismaClient.playerInfo.create({
-    data: plrData,
-  });
-};
+export class PlayerDataUtil {
+  public packet!:Packet;
 
-export const editPlayerData = (userId:number, newPlrData:PlayerInfo) => {
-  // TO DO: return new playerinfo value
-  prismaClient.playerInfo.update({
-    where: {
-      uid: userId,
-    },
-    data: newPlrData,
-  });
-};
+  public playerInfo!:PlayerInfo;
 
-export const findPlayerData = async (userId:number) => {
-  const userData = await prismaClient.playerInfo.findFirst({
-    where: {
-      uid: userId,
-    },
-  });
+  public reqData!:GetPlayerTokenReq;
 
-  return userData;
-};
+  constructor(packet:Packet) {
+    this.packet = packet;
+    this.reqData = packet.protoBuf;
+  }
+
+  async getDataFromUid() {
+    const data = await prismaClient.playerInfo.findFirst({
+      where: {
+        uid: this.reqData.uid,
+      },
+    });
+    this.playerInfo = data!;
+  }
+
+  async editPlayerData(playerUid:number, newPlayerData:PlayerInfo) {
+    try {
+      const data = await prismaClient.playerInfo.update({
+        where: {
+          uid: playerUid,
+        },
+        data: newPlayerData,
+      });
+      this.playerInfo = data;
+    } catch (err:any) {
+      Log(`Unable to update Player data! Reason: ${err}`, LogTypes.Debug);
+    }
+  }
+}
