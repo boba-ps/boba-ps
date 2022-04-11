@@ -1,0 +1,6 @@
+export enum SealBattleType {
+	SEAL_BATTLE_KEEP_ALIVE = 0,
+	SEAL_BATTLE_KILL_MONSTER = 1,
+	SEAL_BATTLE_ENERGY_CHARGE = 2
+}
+

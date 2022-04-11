@@ -1,0 +1,5 @@
+export enum DropSubfieldType {
+	DROP_SUBFIELD_NONE = 0,
+	DROP_SUBFIELD_ONE = 1
+}
+

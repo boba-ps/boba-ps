@@ -1,0 +1,5 @@
+export enum LoginRewardConfigType {
+	LOGIN_REWARD_IMMEDIDATE = 0,
+	LOGIN_REWARD_FIRST = 1
+}
+

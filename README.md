@@ -1,6 +1,11 @@
 # BobaPS-Rewrite
 
-- BobaPS is an experimental Genshin Private Server based on Pancake by [NicknameGG](https://github.com/NicknameGG) and written in TypeScript.
+BobaPS is an experimental Genshin Private Server based on Pancake by [NicknameGG](https://github.com/NicknameGG) and written in TypeScript.
+
+## Notes
+
+- Use ``genTypes.ps1`` on src/utils/protos/ directory.
+- Use .editorconfig plugin for VSCode to not let ESLint shout at you.
 
 ## Documentation
 
@@ -22,20 +27,20 @@
 
 (Assuming that you already have Fiddler set up)
 
-1. Clone the Github Repository
+1.Clone the Github Repository
 
 ```powershell
 git clone https://github.com/boba-ps/BobaPS-Rewrite.git
 ```
 
-2. Extract and open the repository in the Terminal
+2.Extract and open the repository in the Terminal
 
 ```powershell
 # Assuming that you are in Windows
 cd C:\path\to\the\repo\BobaPS-Rewrite
 ```
 
-3. Run the following
+3.Run the following
 
 ```powershell
 yarn

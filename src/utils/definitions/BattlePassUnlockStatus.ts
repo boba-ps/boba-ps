@@ -1,0 +1,6 @@
+export enum BattlePassUnlockStatus {
+	BATTLE_PASS_UNLOCK_INVALID = 0,
+	BATTLE_PASS_UNLOCK_FREE = 1,
+	BATTLE_PASS_UNLOCK_PAID = 2
+}
+

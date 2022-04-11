@@ -1,0 +1,7 @@
+export enum RogueCellState {
+	ROGUE_CELL_NONE = 0,
+	ROGUE_CELL_BATTLE = 1,
+	ROGUE_CELL_SUCCESS = 2,
+	ROGUE_CELL_FINISH = 3
+}
+

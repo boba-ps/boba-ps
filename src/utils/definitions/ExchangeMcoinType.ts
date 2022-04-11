@@ -1,0 +1,6 @@
+export enum ExchangeMcoinType {
+	EXCHANGEMCOIN_NONE = 0,
+	EXCHANGEMCOIN_PCM_TO_PSN = 1,
+	EXCHANGEMCOIN_PSN_TO_PCM = 2
+}
+

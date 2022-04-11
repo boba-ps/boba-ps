@@ -1,0 +1,6 @@
+export enum LunchBoxSlotType {
+	LUNCH_BOX_SLOT_NONE = 0,
+	LUNCH_BOX_SLOT_REVIVE = 1,
+	LUNCH_BOX_SLOT_HEAL = 2
+}
+
