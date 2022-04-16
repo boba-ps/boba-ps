@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@prisma/client": "^3.11.1",
+    "@tsconfig/strictest": "^1.0.1",
     "@types/convict": "^6.1.1",
     "@types/convict-format-with-validator": "^6.0.2",
     "boba-protos": "./protos",
