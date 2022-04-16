@@ -1,16 +1,10 @@
-import { config } from 'dotenv';
-// eslint-disable-next-line import/no-unresolved
-import { KcpServer } from './server/kcp/kcpServer';
-// eslint-disable-next-line import/no-unresolved
-import { Server } from './server/http/httpServer';
-// eslint-disable-next-line import/no-unresolved
-import title from './utils/title';
+import { printTitle } from "./utils/title";
+import { HttpServer } from "./http";
+import { Config } from "./config";
+import { GlobalDispatchHandler } from "./http/globalDispatch";
 
-config();
+printTitle();
 
-(() => {
-  title();
-  const httpServer = new Server(process.env.HOST ?? 'localhost', process.env.PORT as unknown as number ?? 43);
-  httpServer.start();
-  KcpServer.start();
-})();
+new HttpServer()
+  .register(new GlobalDispatchHandler())
+  .start(Config.get("http.host"), Config.get("http.port"));

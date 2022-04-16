@@ -1,7 +1,10 @@
+import dotenv from "dotenv";
 import convict, { addParser, addFormats } from "convict";
 import formats from "convict-format-with-validator";
 import yaml from "yaml";
 import json5 from "json5";
+
+dotenv.config();
 
 addFormats(formats);
 addParser({ extension: ["json", "json5"], parse: json5.parse });
@@ -34,13 +37,15 @@ export const Config = convict({
   },
 });
 
-try {
-  Config.loadFile([
-    `./config.${Config.get("env")}.json`,
-    `./config.${Config.get("env")}.yaml`,
-  ]);
-} catch {
-  // ignored
+for (const path of [
+  `./config.${Config.get("env")}.json`,
+  `./config.${Config.get("env")}.yaml`,
+]) {
+  try {
+    Config.loadFile(path);
+  } catch {
+    // ignored
+  }
 }
 
 Config.validate({ allowed: "strict" });
