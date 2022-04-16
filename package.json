@@ -25,14 +25,22 @@
   },
   "dependencies": {
     "@prisma/client": "^3.11.1",
+    "@types/convict": "^6.1.1",
+    "@types/convict-format-with-validator": "^6.0.2",
     "chalk": "4.1.2",
+    "convict": "^6.2.2",
+    "convict-format-with-validator": "^6.2.0",
     "denque": "^2.0.1",
     "dotenv": "^16.0.0",
     "fastify": "^3.27.4",
+    "json5": "^2.2.1",
     "node-kcp": "^1.0.12",
+    "pino": "^7.10.0",
+    "pino-pretty": "^7.6.1",
     "prisma": "^3.11.0",
     "protobufjs": "^6.11.2",
     "ts-node": "^10.7.0",
-    "ts-proto": "^1.110.2"
+    "ts-proto": "^1.110.2",
+    "yaml": "^2.0.1"
   }
 }
