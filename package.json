@@ -27,6 +27,7 @@
     "@prisma/client": "^3.11.1",
     "@types/convict": "^6.1.1",
     "@types/convict-format-with-validator": "^6.0.2",
+    "boba-protos": "./protos",
     "chalk": "4.1.2",
     "convict": "^6.2.2",
     "convict-format-with-validator": "^6.2.0",

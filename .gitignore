@@ -125,7 +125,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-# haha no free protos for @everyone
-protos/
-json/

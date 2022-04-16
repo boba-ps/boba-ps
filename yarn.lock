@@ -88,6 +88,11 @@
   resolved "https://registry.npmjs.org/@prisma/engines/-/engines-3.11.0-48.b371888aaf8f51357c7457d836b86d12da91658b.tgz"
   integrity sha512-m9iZd5F5vP6A2IvKWfHpOO/qK8OOO9nbsV/pdyEkF/1WNe0E8SIWFBKb+HcMLkG9OFbDDBy8QItXmp/mIULuwQ==
 
+"@protobuf-ts/runtime@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.4.0.tgz#f9c6c81f52745c823e3bfcc6e3d724c2ff1dc647"
+  integrity sha512-73/dE1ZCnNSmxN+M07Zu916TIx5I+WVpxQaMF3TrgenUiYqqQvNRpmfksmL9iiJBNMZqIts1u/flc3pzRFDy6Q==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.npmjs.org/@protobufjs/aspromise/-/aspromise-1.1.2.tgz"
@@ -418,6 +423,11 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+boba-protos@./protos:
+  version "1.0.0"
+  dependencies:
+    "@protobuf-ts/runtime" "^2.4.0"
 
 brace-expansion@^1.1.7:
   version "1.1.11"
