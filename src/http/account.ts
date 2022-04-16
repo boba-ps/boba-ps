@@ -36,11 +36,11 @@ export class AccountHandler extends HttpHandler {
       message: "OK",
       data: {
         account: {
-          uid: "666",
-          name: "",
+          uid: "1",
+          name: "Boba",
           realname: "",
-          token: "",
-          email: "BobaPS v1.0",
+          token: "abcdabcdabcdabcd",
+          email: "Boba",
           is_email_verify: "0",
           area_code: "**",
           country: "US",
