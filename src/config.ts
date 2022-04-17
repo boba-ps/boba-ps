@@ -17,6 +17,14 @@ export const ConfigSchema = {
     env: "NODE_ENV",
   },
 
+  logLevel: {
+    doc: "Minimum log level to print.",
+    format: ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
+    default: "info",
+    env: "BB_LOG_LEVEL",
+    arg: "log-level",
+  },
+
   http: {
     host: {
       doc: "Hostname or IP address to bind the HTTPS server to.",

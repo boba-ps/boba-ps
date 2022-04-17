@@ -13,10 +13,13 @@ import { AccountHandler } from "./http/account";
 import { AdminHandler } from "./http/admin";
 import { KcpServer } from "./kcp";
 import { Clock } from "./utils/clock";
+import { Log } from "./log";
 
 dotenv.config();
 
 async function main(clock: Clock, config: Config) {
+  Log.level = config.get("logLevel");
+
   printTitle();
 
   const tls = await readTlsCert(config);
