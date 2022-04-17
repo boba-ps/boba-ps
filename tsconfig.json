@@ -5,6 +5,7 @@
   },
   "compilerOptions": {
     "target": "es2020",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   }
 }

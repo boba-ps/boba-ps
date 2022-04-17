@@ -95,8 +95,15 @@ export const ConfigSchema = {
     publicAddr: {
       doc: "Public IP address accessible from the client for KCP connection.",
       default: "127.0.0.1:22800",
-      env: "BB_KCP_PUBLIC_URL",
+      env: "BB_KCP_PUBLIC_ADDR",
       arg: "kcp-public-addr",
+    },
+
+    recvBufSize: {
+      doc: "Size of the packet receive buffer.",
+      default: 0x20000,
+      env: "BB_KCP_RECV_BUF_SIZE",
+      arg: "kcp-recv-buf-size",
     },
   },
 };
@@ -110,7 +117,7 @@ export function loadConfig() {
     try {
       config.loadFile(path);
     } catch {
-      // ignored
+      // allow missing files
     }
   }
 

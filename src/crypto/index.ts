@@ -19,7 +19,7 @@ export async function readEc2bKey(config: Config): Promise<Ec2bKey> {
 
 export function cipherEc2b(ec2b: Ec2bKey, buffer: ArrayBufferLike): Buffer {
   const src = new Uint8Array(buffer);
-  const dst = Buffer.alloc(src.byteLength);
+  const dst = Buffer.allocUnsafe(src.byteLength);
   const { key } = ec2b;
 
   for (let i = 0; i < src.byteLength; i++) {
