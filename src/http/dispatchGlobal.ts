@@ -25,10 +25,7 @@ export class GlobalDispatchHandler extends HttpHandler {
       name: "os_boba",
       title: "BobaPS",
       type: "DEV_PUBLIC",
-      dispatchUrl: new URL(
-        "query_cur_region",
-        this.config.get("http.publicUrl")
-      ).href,
+      dispatchUrl: new URL("query_cur_region", this.config.get("http.publicUrl")).href,
     });
 
     const regionList = QueryRegionListHttpRsp.create({
@@ -51,10 +48,6 @@ export class GlobalDispatchHandler extends HttpHandler {
       enableLoginPc: true,
     });
 
-    res.send(
-      Buffer.from(QueryRegionListHttpRsp.toBinary(regionList)).toString(
-        "base64"
-      )
-    );
+    res.send(Buffer.from(QueryRegionListHttpRsp.toBinary(regionList)).toString("base64"));
   }
 }

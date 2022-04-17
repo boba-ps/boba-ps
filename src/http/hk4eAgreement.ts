@@ -7,10 +7,7 @@ export class Hk4eAgreementHandler extends HttpHandler {
   }
 
   setup(server: HttpsServer): void {
-    server.http.get(
-      "/hk4e_global/mdk/agreement/api/getAgreementInfos",
-      this.getAgreementInfos.bind(this)
-    );
+    server.http.get("/hk4e_global/mdk/agreement/api/getAgreementInfos", this.getAgreementInfos.bind(this));
   }
 
   async getAgreementInfos(_req: HttpRequest, res: HttpResponse) {

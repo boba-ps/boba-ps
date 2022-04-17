@@ -106,10 +106,7 @@ export type Config = ReturnType<typeof loadConfig>;
 export function loadConfig() {
   const config = convict(ConfigSchema);
 
-  for (const path of [
-    `./config.${config.get("env")}.json`,
-    `./config.${config.get("env")}.yaml`,
-  ]) {
+  for (const path of [`./config.${config.get("env")}.json`, `./config.${config.get("env")}.yaml`]) {
     try {
       config.loadFile(path);
     } catch {

@@ -10,7 +10,7 @@ export type Ec2bKey = {
   key: Buffer;
 };
 
-export async function readEc2b(config: Config): Promise<Ec2bKey> {
+export async function readEc2bKey(config: Config): Promise<Ec2bKey> {
   return {
     ec2b: await readFile(config.get("ec2b.path")),
     key: await readFile(config.get("ec2b.keyPath")),

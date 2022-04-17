@@ -8,10 +8,7 @@ export class Hk4eGranterHandler extends HttpHandler {
 
   setup(server: HttpsServer): void {
     server.http
-      .get(
-        "/hk4e_global/combo/granter/api/getConfig",
-        this.getConfig.bind(this)
-      )
+      .get("/hk4e_global/combo/granter/api/getConfig", this.getConfig.bind(this))
       .post("/hk4e_global/combo/granter/login/v2/login", {
         schema: {
           body: {
@@ -24,10 +21,7 @@ export class Hk4eGranterHandler extends HttpHandler {
         },
         handler: this.login.bind(this),
       })
-      .post(
-        "/hk4e_global/combo/granter/api/compareProtocolVersion",
-        this.compareProtocolVersion.bind(this)
-      );
+      .post("/hk4e_global/combo/granter/api/compareProtocolVersion", this.compareProtocolVersion.bind(this));
   }
 
   async getConfig(_req: HttpRequest, res: HttpResponse) {
@@ -41,10 +35,7 @@ export class Hk4eGranterHandler extends HttpHandler {
         push_alias_type: 2,
         disable_ysdk_guard: false,
         enable_announce_pic_popup: true,
-        announce_url: new URL(
-          "hk4e/announcement/index.html",
-          this.config.get("http.publicUrl")
-        ),
+        announce_url: new URL("hk4e/announcement/index.html", this.config.get("http.publicUrl")),
       },
     });
   }

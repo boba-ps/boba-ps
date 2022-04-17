@@ -30,21 +30,13 @@ export class RegionDispatchHandler extends HttpHandler {
         Buffer.from(
           JSON.stringify({
             coverSwitch: [8],
-            perf_report_config_url: new URL(
-              "config/verify",
-              this.config.get("http.publicUrl")
-            ),
-            perf_report_record_url: new URL(
-              "dataUpload",
-              this.config.get("http.publicUrl")
-            ),
+            perf_report_config_url: new URL("config/verify", this.config.get("http.publicUrl")),
+            perf_report_record_url: new URL("dataUpload", this.config.get("http.publicUrl")),
           })
         )
       ),
     });
 
-    res.send(
-      Buffer.from(QueryCurrRegionHttpRsp.toBinary(region)).toString("base64")
-    );
+    res.send(Buffer.from(QueryCurrRegionHttpRsp.toBinary(region)).toString("base64"));
   }
 }
