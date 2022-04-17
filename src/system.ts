@@ -29,12 +29,12 @@ export class Executor extends ServiceBase<Executor> {
   }
 
   private onceTasks: ExecutorTask[] = [];
-  private everyTasks: ExecutorTask[] = [];
+  private frameTasks: ExecutorTask[] = [];
   private intervalTasks: IntervalTask[] = [];
   private endTasks: ExecutorTask[] = [];
 
   protected setup(parent: Executor) {
-    parent.every(this.runFrame.bind(this));
+    parent.tick(this.runFrame.bind(this));
     parent.end(this.runEnd.bind(this));
   }
 
@@ -46,7 +46,7 @@ export class Executor extends ServiceBase<Executor> {
     this.onceTasks = [];
 
     this.runTasks(once);
-    this.runTasks(this.everyTasks);
+    this.runTasks(this.frameTasks);
 
     if (this.intervalTasks.length !== 0) {
       const due: ExecutorTask[] = [];
@@ -90,12 +90,12 @@ export class Executor extends ServiceBase<Executor> {
   }
 
   /** Registers a task for execution every frame. */
-  every(task: ExecutorTask) {
-    !this.everyTasks.includes(task) && this.everyTasks.push(task);
+  tick(task: ExecutorTask) {
+    !this.frameTasks.includes(task) && this.frameTasks.push(task);
   }
 
   /** Registers a task for execution every given interval in milliseconds. */
-  interval(ms: number, task: ExecutorTask) {
+  every(ms: number, task: ExecutorTask) {
     if (!this.intervalTasks.some((t) => t.fn === task)) {
       this.intervalTasks.push(new IntervalTask(task, ms, this.clock.now() + ms));
     }

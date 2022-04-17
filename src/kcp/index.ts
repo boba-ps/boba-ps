@@ -48,7 +48,7 @@ export class KcpServer extends ServiceBase<Executor> {
       Log.info(`Server listening at udp://${host}:${port}`);
     });
 
-    exec.every(() => {
+    exec.tick(() => {
       for (const packet of this.udp) {
         try {
           const handshake = HandshakePacket.decode(packet.buffer);
@@ -64,7 +64,7 @@ export class KcpServer extends ServiceBase<Executor> {
       }
     });
 
-    exec.interval(100, () => {
+    exec.every(100, () => {
       this.connections.update();
     });
 
