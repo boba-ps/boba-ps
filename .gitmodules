@@ -1,3 +1,6 @@
 [submodule "protos"]
 	path = protos
 	url = git@github.com:boba-ps/boba-protos.git
+[submodule "kcp"]
+	path = kcp
+	url = git@github.com:boba-ps/kcp-ts.git

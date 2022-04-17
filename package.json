@@ -36,6 +36,7 @@
     "dotenv": "^16.0.0",
     "fastify": "^3.27.4",
     "json5": "^2.2.1",
+    "kcp-ts": "./kcp",
     "node-kcp": "^1.0.12",
     "pino": "^7.10.0",
     "pino-pretty": "^7.6.1",
