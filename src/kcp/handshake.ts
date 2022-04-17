@@ -9,8 +9,10 @@ const DISCONNECT_START = 0x00000194;
 const DISCONNECT_END = 0x19419494;
 
 export abstract class HandshakePacket {
+  static readonly size = 20;
+
   static decode(buffer: Buffer) {
-    if (buffer.length !== 20) {
+    if (buffer.length !== HandshakePacket.size) {
       return false;
     }
 
@@ -38,7 +40,7 @@ export abstract class HandshakePacket {
   abstract encode(): Buffer;
 
   protected encodePacket(start: number, param1: number, param2: number, data: number, end: number) {
-    const buffer = Buffer.allocUnsafe(20);
+    const buffer = Buffer.allocUnsafe(HandshakePacket.size);
 
     buffer.writeUInt32BE(start);
     buffer.writeUInt32BE(param1, 4);

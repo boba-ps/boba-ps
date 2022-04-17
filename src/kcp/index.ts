@@ -1,4 +1,4 @@
-import type { Ec2bKey } from "../crypto";
+import { cloneBuffer, Ec2bKey, xorBuffer } from "../crypto";
 import { MT19937_64 } from "../crypto/mt64";
 import { Log } from "../log";
 import { ConnectPacket, DisconnectPacket, EstablishPacket, HandshakePacket } from "./handshake";
@@ -8,6 +8,10 @@ import type { Clock } from "../utils/clock";
 import type { Config } from "../config";
 import { CustomError } from "ts-custom-error";
 import { Executor, ServiceBase } from "../system";
+import { DataPacket } from "./packet";
+import { PacketRouter } from "./router";
+
+export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 
 export class KcpError extends CustomError {
   constructor(readonly code: number, message?: string) {
@@ -18,14 +22,21 @@ export class KcpError extends CustomError {
 export class KcpServer extends ServiceBase<Executor> {
   readonly udp;
   readonly connections;
+  readonly router;
+
+  // optimization
   readonly sharedBuffer;
+  readonly sharedMt;
 
   constructor(readonly config: Config, readonly clock: Clock, readonly ec2b: Ec2bKey) {
     super();
 
     this.udp = new UdpServer({ type: "udp4" });
     this.connections = new KcpConnectionManager(this);
+    this.router = new PacketRouter();
+
     this.sharedBuffer = Buffer.alloc(config.get("kcp.recvBufSize"));
+    this.sharedMt = new MT19937_64();
   }
 
   protected setup(exec: Executor) {
@@ -87,24 +98,22 @@ export class KcpServer extends ServiceBase<Executor> {
       const read = connection.kcp.input(buffer);
 
       if (read === -1 || read === -2 || read === -3) {
-        Log.debug(
-          { buffer: buffer.toString("hex"), address, port, conv, token, read },
-          "received malformed kcp packet"
-        );
-      } else if (read < 0) {
-        Log.warn(
-          { buffer: buffer.toString("hex"), address, port, conv, token, read },
-          `unknown kcp error ${read} during processing`
-        );
-      } else if (read !== buffer.length) {
-        Log.debug(
-          { buffer: buffer.toString("hex"), address, port, conv, token, read },
-          `ignored ${buffer.length - read} superfluous bytes from kcp packet`
-        );
-      } else {
-        if (Log.isLevelEnabled("trace")) {
-          Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "processed kcp packet");
+        if (Log.isLevelEnabled("debug")) {
+          Log.debug(
+            { buffer: buffer.toString("hex"), address, port, conv, token, read },
+            "received malformed kcp packet"
+          );
         }
+
+        return;
+      }
+
+      if (Log.isLevelEnabled("trace")) {
+        Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "processed kcp packet");
+      }
+
+      for (const packet of connection) {
+        this.handleDataPacket(connection, packet);
       }
     } else {
       if (Log.isLevelEnabled("trace")) {
@@ -112,6 +121,18 @@ export class KcpServer extends ServiceBase<Executor> {
           { buffer: buffer.toString("hex"), address, port, conv, token },
           "ignored kcp packet from unknown connection"
         );
+      }
+    }
+  }
+
+  private handleDataPacket(connection: KcpConnection, buffer: Buffer) {
+    const packet = DataPacket.decode(buffer);
+
+    if (packet) {
+      this.router.handle(connection, packet);
+    } else {
+      if (Log.isLevelEnabled("debug")) {
+        Log.debug({ buffer: buffer.toString("hex"), connection }, "received malformed data packet");
       }
     }
   }
@@ -141,17 +162,50 @@ export class KcpConnectionManager {
   }
 
   update() {
+    for (const connection of this) {
+      // TODO: dead connection handling
+      connection.kcp.update(connection.clock.now());
+    }
+  }
+
+  *[Symbol.iterator]() {
     for (const connections of Object.values(this.store)) {
       for (const connection of connections) {
-        // TODO: dead connection handling
-        connection.kcp.update(connection.clock.now());
+        yield connection;
       }
+    }
+  }
+}
+
+export class KcpConnectionEncryptor {
+  private key;
+
+  constructor(readonly server: KcpServer) {
+    this.key = server.ec2b.key;
+  }
+
+  cipher(buffer: Buffer) {
+    xorBuffer(this.key, buffer);
+  }
+
+  seed(seed: bigint) {
+    const mt = this.server.sharedMt;
+
+    mt.seed(seed);
+    mt.seed(mt.next());
+    mt.next();
+
+    this.key = Buffer.allocUnsafe(0x1000);
+
+    for (let i = 0; i < 0x1000; i += 8) {
+      this.key.writeBigUInt64BE(mt.next(), i);
     }
   }
 }
 
 export class KcpConnection {
   readonly kcp;
+  readonly encryptor;
 
   constructor(
     readonly manager: KcpConnectionManager,
@@ -163,10 +217,11 @@ export class KcpConnection {
   ) {
     this.kcp = new Kcp(conv, token, (buffer) => {
       // kcp buffer must be cloned because it is reused internally
-      const packet = Buffer.allocUnsafe(buffer.length);
-      buffer.copy(packet);
-      this.sendRaw(packet);
+      this.sendRaw(cloneBuffer(buffer));
     });
+
+    this.kcp.setWndSize(1024, 1024);
+    this.encryptor = new KcpConnectionEncryptor(manager.server);
   }
 
   get connected() {
@@ -175,7 +230,9 @@ export class KcpConnection {
 
   /** Sends the given packet on the KCP connection. */
   send(buffer: Buffer) {
-    this.kcp.send(buffer);
+    const encrypted = cloneBuffer(buffer);
+    this.encryptor.cipher(encrypted);
+    this.kcp.send(encrypted);
   }
 
   /** Sends the given packet directly on the underlying UDP "connection". */
@@ -198,18 +255,20 @@ export class KcpConnection {
         throw new KcpError(read, "kcp read buffer is too small");
     }
 
-    if (read < 0) {
-      throw new KcpError(read, "unknown error");
-    }
-
-    // shared buffer will be reused; let's copy
-    const copy = Buffer.allocUnsafe(read);
-    buffer.copy(copy);
-    return copy;
+    const decrypted = cloneBuffer(buffer.slice(0, read));
+    this.encryptor.cipher(decrypted);
+    return decrypted;
   }
 
   /** Flushes all pending data in the KCP send buffer. */
   flush() {
     this.kcp.flush();
+  }
+
+  *[Symbol.iterator]() {
+    let packet;
+    while ((packet = this.recv())) {
+      yield packet;
+    }
   }
 }
