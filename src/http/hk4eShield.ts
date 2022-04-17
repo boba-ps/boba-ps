@@ -9,7 +9,7 @@ export class Hk4eShieldHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http
       .get('/hk4e_global/mdk/shield/api/loadConfig', this.loadConfig.bind(this))
       .post('/hk4e_global/mdk/shield/api/login', {

@@ -1,17 +1,16 @@
-/* eslint-disable no-use-before-define */
-/* eslint-disable max-classes-per-file */
-import { fastify, FastifyReply, FastifyRequest } from 'fastify';
-import type { RouteGenericInterface } from 'fastify/types/route';
-import type {
-  Http2SecureServer,
-  Http2ServerRequest,
-  Http2ServerResponse,
-} from 'http2';
-import { Log } from '../log';
-import type { TlsCert } from './tls';
+import { fastify, FastifyReply, FastifyRequest } from "fastify";
+import type { RouteGenericInterface } from "fastify/types/route";
+import type { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from "http2";
+import type { Config } from "../config";
+import { Log } from "../log";
+import { Executor, ServiceBase } from "../system";
+import type { TlsCert } from "./tls";
 
-export type HttpRequest<RouteInterface = RouteGenericInterface> =
-  FastifyRequest<RouteInterface, Http2SecureServer, Http2ServerRequest>;
+export type HttpRequest<RouteInterface = RouteGenericInterface> = FastifyRequest<
+  RouteInterface,
+  Http2SecureServer,
+  Http2ServerRequest
+>;
 
 export type HttpResponse<RouteInterface = RouteGenericInterface> = FastifyReply<
   Http2SecureServer,
@@ -20,15 +19,14 @@ export type HttpResponse<RouteInterface = RouteGenericInterface> = FastifyReply<
   RouteInterface
 >;
 
-export abstract class HttpHandler {
-  // eslint-disable-next-line no-unused-vars
-  abstract setup(server: HttpsServer): void;
-}
+export abstract class HttpHandler extends ServiceBase<HttpsServer> {}
 
-export class HttpsServer {
+export class HttpsServer extends ServiceBase<Executor> {
   readonly http;
 
-  constructor(cert: TlsCert) {
+  constructor(readonly config: Config, cert: TlsCert) {
+    super();
+
     this.http = fastify({
       logger: Log,
       http2: true,
@@ -40,16 +38,16 @@ export class HttpsServer {
     });
   }
 
-  register(handler: HttpHandler) {
-    handler.setup(this);
-    return this;
-  }
+  protected setup(exec: Executor) {
+    exec.once(async () => {
+      const host = this.config.get("http.host");
+      const port = this.config.get("http.port");
 
-  async start(host: string, port: number) {
-    await this.http.listen({ port, host });
-  }
+      await this.http.listen(port, host);
+    });
 
-  async close() {
-    await this.http.close();
+    exec.end(async () => {
+      await this.http.close();
+    });
   }
 }

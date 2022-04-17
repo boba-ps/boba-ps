@@ -4,7 +4,7 @@
     "files": true
   },
   "compilerOptions": {
-    "target": "ES2016",
+    "target": "es2020",
     "moduleResolution": "node",
     "resolveJsonModule": true
   }

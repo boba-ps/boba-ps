@@ -9,7 +9,7 @@ export class AdminHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http.get(
       '/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json',
       this.version2020030410.bind(this),

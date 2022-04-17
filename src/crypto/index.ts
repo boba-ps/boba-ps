@@ -10,21 +10,27 @@ export type Ec2bKey = {
   key: Buffer;
 };
 
-export async function readEc2b(config: Config): Promise<Ec2bKey> {
+export async function readEc2bKey(config: Config): Promise<Ec2bKey> {
   return {
     ec2b: await readFile(config.get('ec2b.path')),
     key: await readFile(config.get('ec2b.keyPath')),
   };
 }
 
-export function cipherEc2b(ec2b: Ec2bKey, buffer: ArrayBufferLike): Buffer {
-  const src = new Uint8Array(buffer);
-  const dst = Buffer.alloc(src.byteLength);
-  const { key } = ec2b;
+export function cipherEc2b(ec2b: Ec2bKey, buffer: Buffer) {
+  const other = cloneBuffer(buffer);
+  xorBuffer(ec2b.key, other);
+  return other;
+}
 
-  for (let i = 0; i < src.byteLength; i++) {
-    dst[i] = src[i]! ^ key[i % key.length]!;
+export function cloneBuffer(buffer: Buffer) {
+  const other = Buffer.allocUnsafe(buffer.length);
+  buffer.copy(other);
+  return other;
+}
+
+export function xorBuffer(key: Buffer, buffer: Buffer) {
+  for (let i = 0; i < buffer.length; i++) {
+    buffer[i] ^= key[i % key.length]!;
   }
-
-  return dst;
 }
