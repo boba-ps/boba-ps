@@ -8,7 +8,7 @@ export class RegionDispatchHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http.get("/query_cur_region", this.queryCurrRegion.bind(this));
   }
 

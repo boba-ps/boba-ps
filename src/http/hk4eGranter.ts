@@ -6,7 +6,7 @@ export class Hk4eGranterHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http
       .get("/hk4e_global/combo/granter/api/getConfig", this.getConfig.bind(this))
       .post("/hk4e_global/combo/granter/login/v2/login", {

@@ -8,7 +8,7 @@ export class GlobalDispatchHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer) {
+  protected setup(server: HttpsServer) {
     server.http
       .get("/query_security_file", this.querySecurityFile.bind(this))
       .get("/query_region_list", this.queryRegionList.bind(this));

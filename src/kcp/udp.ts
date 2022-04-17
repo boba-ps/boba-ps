@@ -1,6 +1,6 @@
+import Denque from "denque";
 import { createSocket, RemoteInfo, SocketOptions } from "dgram";
 import { Log } from "../log";
-import { Channel } from "../utils/async";
 
 export type UdpPacket = {
   buffer: Buffer;
@@ -8,16 +8,20 @@ export type UdpPacket = {
   port: number;
 };
 
-/// Asynchronous UDP socket wrapper.
 export class UdpServer {
   readonly socket;
 
   private closed = false;
-  private readonly recvQueue = new Channel<UdpPacket>();
+  private readonly recvQueue = new Denque<UdpPacket>();
 
   constructor(options: SocketOptions) {
     this.socket = createSocket(options, this.handleMessage.bind(this));
     this.socket.on("error", (err) => Log.error({ err }, "unhandled error on udp socket"));
+  }
+
+  private handleMessage(buffer: Buffer, { address, port }: RemoteInfo) {
+    if (this.closed) return;
+    this.recvQueue.push({ buffer, address, port });
   }
 
   async bind(host: string, port: number) {
@@ -27,13 +31,7 @@ export class UdpServer {
 
   async close() {
     this.closed = true;
-    this.recvQueue.close();
     await new Promise<void>((res) => this.socket.close(res));
-  }
-
-  private handleMessage(buffer: Buffer, { address, port }: RemoteInfo) {
-    if (this.closed) return;
-    this.recvQueue.send({ buffer, address, port }).catch(() => {});
   }
 
   send(packet: UdpPacket) {
@@ -43,14 +41,14 @@ export class UdpServer {
     this.socket.send(buffer, port, address);
   }
 
-  async recv() {
+  recv() {
     if (this.closed) return;
-    return await this.recvQueue.recv();
+    return this.recvQueue.shift();
   }
 
-  async *[Symbol.asyncIterator]() {
+  *[Symbol.iterator]() {
     let packet;
-    while ((packet = await this.recv())) {
+    while ((packet = this.recv())) {
       yield packet;
     }
   }

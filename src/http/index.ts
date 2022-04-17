@@ -3,7 +3,7 @@ import type { RouteGenericInterface } from "fastify/types/route";
 import type { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from "http2";
 import type { Config } from "../config";
 import { Log } from "../log";
-import { DeferredPromise } from "../utils/async";
+import { Executor, ServiceBase } from "../system";
 import type { TlsCert } from "./tls";
 
 export type HttpRequest<RouteInterface = RouteGenericInterface> = FastifyRequest<
@@ -19,14 +19,14 @@ export type HttpResponse<RouteInterface = RouteGenericInterface> = FastifyReply<
   RouteInterface
 >;
 
-export abstract class HttpHandler {
-  abstract setup(server: HttpsServer): void;
-}
+export abstract class HttpHandler extends ServiceBase<HttpsServer> {}
 
-export class HttpsServer {
+export class HttpsServer extends ServiceBase<Executor> {
   readonly http;
 
   constructor(readonly config: Config, cert: TlsCert) {
+    super();
+
     this.http = fastify({
       logger: Log,
       http2: true,
@@ -38,24 +38,16 @@ export class HttpsServer {
     });
   }
 
-  register(handler: HttpHandler) {
-    handler.setup(this);
-    return this;
-  }
+  protected setup(exec: Executor) {
+    exec.once(async () => {
+      const host = this.config.get("http.host");
+      const port = this.config.get("http.port");
 
-  private readonly complete = new DeferredPromise<void>();
+      await this.http.listen(port, host);
+    });
 
-  async run(host: string, port: number) {
-    await this.http.listen({ port, host });
-
-    try {
-      await this.complete;
-    } finally {
+    exec.end(async () => {
       await this.http.close();
-    }
-  }
-
-  stop() {
-    this.complete.resolve();
+    });
   }
 }

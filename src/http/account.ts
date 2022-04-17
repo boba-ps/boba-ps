@@ -6,7 +6,7 @@ export class AccountHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http
       .post("/account/risky/api/check", {
         schema: {

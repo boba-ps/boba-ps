@@ -1,11 +1,6 @@
 import Denque from "denque";
 import { CustomError } from "ts-custom-error";
 
-// TODO: don't use setTimeout; write Clock-based sleep function later
-export async function sleep(ms: number) {
-  await new Promise<void>((res) => setTimeout(res, ms));
-}
-
 /** Promise that allows an external caller to resolve itself. */
 export class DeferredPromise<T = unknown> {
   readonly then;
@@ -32,6 +27,11 @@ export class ChannelClosedError extends CustomError {
     super("channel is closed");
   }
 }
+
+type ChannelItem<T> = {
+  value: T;
+  notify: DeferredPromise<void>;
+};
 
 /** Unidirectional Promise-based unbounded MPMC FIFO channel. */
 export class Channel<T = unknown> {
@@ -88,8 +88,3 @@ export class Channel<T = unknown> {
     }
   }
 }
-
-type ChannelItem<T> = {
-  value: T;
-  notify: DeferredPromise<void>;
-};

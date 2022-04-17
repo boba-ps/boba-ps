@@ -12,12 +12,13 @@ import { Hk4eAgreementHandler } from "./http/hk4eAgreement";
 import { AccountHandler } from "./http/account";
 import { AdminHandler } from "./http/admin";
 import { KcpServer } from "./kcp";
-import { Clock } from "./utils/clock";
+import { Clock, SystemClock } from "./utils/clock";
 import { Log } from "./log";
+import { SystemExecutor } from "./system";
 
 dotenv.config();
 
-async function main(clock: Clock, config: Config) {
+async function start(clock: Clock, config: Config) {
   Log.level = config.get("logLevel");
 
   printTitle();
@@ -25,22 +26,19 @@ async function main(clock: Clock, config: Config) {
   const tls = await readTlsCert(config);
   const ec2b = await readEc2bKey(config);
 
-  const http = new HttpsServer(config, tls)
-    .register(new AdminHandler(config))
-    .register(new AccountHandler(config))
-    .register(new GlobalDispatchHandler(config, ec2b))
-    .register(new RegionDispatchHandler(config, ec2b))
-    .register(new Hk4eAgreementHandler(config))
-    .register(new Hk4eShieldHandler(config))
-    .register(new Hk4eGranterHandler(config));
-
-  const kcp = new KcpServer(config, clock, ec2b);
-
-  // TODO: Clock-based event loop
-  await Promise.all([
-    http.run(config.get("http.host"), config.get("http.port")),
-    kcp.run(config.get("kcp.host"), config.get("kcp.port")),
-  ]);
+  new SystemExecutor(clock)
+    .register(
+      new HttpsServer(config, tls)
+        .register(new AdminHandler(config))
+        .register(new AccountHandler(config))
+        .register(new GlobalDispatchHandler(config, ec2b))
+        .register(new RegionDispatchHandler(config, ec2b))
+        .register(new Hk4eAgreementHandler(config))
+        .register(new Hk4eShieldHandler(config))
+        .register(new Hk4eGranterHandler(config))
+    )
+    .register(new KcpServer(config, clock, ec2b))
+    .start(100);
 }
 
-main(Clock.system().withStart(0), loadConfig());
+start(new SystemClock(), loadConfig());

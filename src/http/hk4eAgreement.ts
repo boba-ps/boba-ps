@@ -6,7 +6,7 @@ export class Hk4eAgreementHandler extends HttpHandler {
     super();
   }
 
-  setup(server: HttpsServer): void {
+  protected setup(server: HttpsServer) {
     server.http.get("/hk4e_global/mdk/agreement/api/getAgreementInfos", this.getAgreementInfos.bind(this));
   }
 

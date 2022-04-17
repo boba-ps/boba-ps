@@ -5,9 +5,9 @@ import { ConnectPacket, DisconnectPacket, EstablishPacket, HandshakePacket } fro
 import { getConv, getToken, Kcp } from "kcp-ts";
 import { UdpPacket, UdpServer } from "./udp";
 import type { Clock } from "../utils/clock";
-import { sleep } from "../utils/async";
 import type { Config } from "../config";
 import { CustomError } from "ts-custom-error";
+import { Executor, ServiceBase } from "../system";
 
 export class KcpError extends CustomError {
   constructor(readonly code: number, message?: string) {
@@ -15,65 +15,51 @@ export class KcpError extends CustomError {
   }
 }
 
-export abstract class KcpHandler {
-  abstract setup(server: KcpServer): void;
-}
-
-export class KcpServer {
+export class KcpServer extends ServiceBase<Executor> {
   readonly udp;
   readonly connections;
   readonly sharedBuffer;
 
-  private closed = false;
-
   constructor(readonly config: Config, readonly clock: Clock, readonly ec2b: Ec2bKey) {
+    super();
+
     this.udp = new UdpServer({ type: "udp4" });
     this.connections = new KcpConnectionManager(this);
     this.sharedBuffer = Buffer.alloc(config.get("kcp.recvBufSize"));
   }
 
-  register(handler: KcpHandler) {
-    handler.setup(this);
-    return this;
-  }
+  protected setup(exec: Executor) {
+    exec.once(async () => {
+      const host = this.config.get("kcp.host");
+      const port = this.config.get("kcp.port");
 
-  async run(host: string, port: number) {
-    await this.udp.bind(host, port);
-
-    try {
+      await this.udp.bind(host, port);
       Log.info(`Server listening at udp://${host}:${port}`);
-      await Promise.all([this.runReceive(), this.runUpdate()]);
-    } finally {
-      await this.udp.close();
-    }
-  }
+    });
 
-  stop() {
-    this.closed = true;
-    this.udp.close();
-  }
+    exec.every(() => {
+      for (const packet of this.udp) {
+        try {
+          const handshake = HandshakePacket.decode(packet.buffer);
 
-  private async runReceive() {
-    for await (const packet of this.udp) {
-      try {
-        const handshake = HandshakePacket.decode(packet.buffer);
-
-        if (handshake) {
-          this.handleHandshake(packet, handshake);
-        } else {
-          this.handleKcpPacket(packet);
+          if (handshake) {
+            this.handleHandshake(packet, handshake);
+          } else {
+            this.handleKcpPacket(packet);
+          }
+        } catch {
+          Log.error({ packet }, "unhandled error in udp packet handler");
         }
-      } catch {
-        Log.error({ packet }, "unhandled error in udp packet handler");
       }
-    }
-  }
+    });
 
-  private async runUpdate() {
-    while (!this.closed) {
+    exec.interval(100, () => {
       this.connections.update();
-      await sleep(100);
-    }
+    });
+
+    exec.end(async () => {
+      await this.udp.close();
+    });
   }
 
   private handleHandshake({ address, port }: UdpPacket, handshake: HandshakePacket) {
