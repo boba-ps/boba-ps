@@ -1,10 +1,10 @@
-import kcp from 'node-kcp';
+import type kcp from 'node-kcp';
 /* eslint-disable max-len */
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-unresolved */
 import protobuf from 'protobufjs';
 import packetIds from './packetIds/packetIds.json';
-import { Err, Log, LogTypes } from './logging';
+import { Log } from '../log';
 import { Packet } from './packet';
 
 const pIds = packetIds as { [packetIds: string]: string };
@@ -13,6 +13,7 @@ export const switchedPacketIds = () => {
   const obj: { [key: string]: any } = {};
 
   Object.keys(pIds).forEach((key) => {
+    // @ts-expect-error
     obj[pIds[key]] = key;
   });
 
@@ -51,7 +52,7 @@ export const objToProtoBuffer = async (obj: object, packetID: string | number) =
     } else {
       protoName = packetID;
     }
-    Log(`[PID]: Got proto ${protoName}`, LogTypes.Debug);
+    Log.info(`[PID]: Got proto ${protoName}`);
     const root = await protobuf.load(`./protos/${protoName}.proto`);
 
     const testMessage = root.lookupType(protoName);
@@ -71,7 +72,7 @@ export const dataToProtobuf = async (data: Buffer, packetID: string) => {
     const testMessage = root.lookupType(protoName);
     return testMessage.decode(data);
   } catch (e) {
-    Err(`Error parsing packet ${getProtoNameByPacketId(packetID)}`, LogTypes.KCP);
+    Log.fatal(`Error parsing packet ${getProtoNameByPacketId(packetID)}`);
   }
 };
 export const protobufToObj = async (obj: object, packetID: string) => {
@@ -82,7 +83,7 @@ export const protobufToObj = async (obj: object, packetID: string) => {
     const testMessage = root.lookupType(protoName);
     return testMessage.toObject(testMessage.create(obj));
   } catch (e: Error | any) {
-    Err(e.message, LogTypes.Http);
+    Log.fatal(e.message);
   }
 };
 export const reformatKcpPacket = (message: Buffer) => {

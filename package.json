@@ -7,7 +7,7 @@
     "start": "ts-node src/index.ts",
     "migrate": "prisma migrate dev --name db --schema ./src/prisma/schema.prisma",
     "gen-client": "prisma generate --schema=./src/prisma/schema.prisma",
-    "lint": "eslint ./src/**"
+    "lint": "eslint ./src/** --fix"
   },
   "repository": "https://github.com/boba-ps/BobaPS-Rewrite",
   "author": "quinella <98860103+quinelladesuu@users.noreply.github.com>",

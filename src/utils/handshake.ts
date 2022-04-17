@@ -20,7 +20,9 @@ export class Handshake {
 
   // eslint-disable-next-line max-len
   public constructor(magic:number[] = [0x0, 0x0], conv:number = 0, token:number = 0, data:number = 0) {
+    // @ts-expect-error
     this.Magic1 = magic[0];
+    // @ts-expect-error
     this.Magic2 = magic[1];
     this.Conv = conv;
     this.Token = token;

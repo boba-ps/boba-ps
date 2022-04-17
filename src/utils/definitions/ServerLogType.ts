@@ -1,8 +1,0 @@
-export enum ServerLogType {
-	SERVER_LOG_NONE = 0,
-	SERVER_LOG_ABILITY = 1,
-	SERVER_LOG_LEVEL = 2,
-	SERVER_LOG_ENTITY = 3,
-	SERVER_LOG_LUA = 4
-}
-

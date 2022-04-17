@@ -1,8 +1,0 @@
-export enum ExploreType {
-	EXPLORE_NONE = 0,
-	EXPLORE_CRYSTAL = 1,
-	EXPLORE_CHEST = 2,
-	EXPLORE_TEMPLE = 3,
-	EXPLORE_TELEPORT = 4
-}
-

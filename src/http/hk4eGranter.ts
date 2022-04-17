@@ -1,7 +1,10 @@
-import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
-import type { Config } from "../config";
+import {
+  HttpHandler, HttpRequest, HttpResponse, HttpsServer,
+} from '.';
+import type { Config } from '../config';
 
 export class Hk4eGranterHandler extends HttpHandler {
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config) {
     super();
   }
@@ -9,41 +12,41 @@ export class Hk4eGranterHandler extends HttpHandler {
   setup(server: HttpsServer): void {
     server.http
       .get(
-        "/hk4e_global/combo/granter/api/getConfig",
-        this.getConfig.bind(this)
+        '/hk4e_global/combo/granter/api/getConfig',
+        this.getConfig.bind(this),
       )
-      .post("/hk4e_global/combo/granter/login/v2/login", {
+      .post('/hk4e_global/combo/granter/login/v2/login', {
         schema: {
           body: {
-            app_id: { type: "string" },
-            channel_id: { type: "string" },
-            device: { type: "string" },
-            sign: { type: "string" },
-            data: { type: "string" },
+            app_id: { type: 'string' },
+            channel_id: { type: 'string' },
+            device: { type: 'string' },
+            sign: { type: 'string' },
+            data: { type: 'string' },
           },
         },
         handler: this.login.bind(this),
       })
       .post(
-        "/hk4e_global/combo/granter/api/compareProtocolVersion",
-        this.compareProtocolVersion.bind(this)
+        '/hk4e_global/combo/granter/api/compareProtocolVersion',
+        this.compareProtocolVersion.bind(this),
       );
   }
 
   async getConfig(_req: HttpRequest, res: HttpResponse) {
     res.send({
       retcode: 0,
-      message: "OK",
+      message: 'OK',
       data: {
-        log_level: "INFO",
+        log_level: 'INFO',
         protocol: true,
         qr_enabled: false,
         push_alias_type: 2,
         disable_ysdk_guard: false,
         enable_announce_pic_popup: true,
         announce_url: new URL(
-          "hk4e/announcement/index.html",
-          this.config.get("http.publicUrl")
+          'hk4e/announcement/index.html',
+          this.config.get('http.publicUrl'),
         ),
       },
     });
@@ -59,17 +62,17 @@ export class Hk4eGranterHandler extends HttpHandler {
         data: string;
       };
     }>,
-    res: HttpResponse
+    res: HttpResponse,
   ) {
     res.send({
       retcode: 0,
-      message: "OK",
+      message: 'OK',
       data: {
-        account_type: "1",
+        account_type: '1',
         open_id: `${0x1234}`,
         combo_id: `${0x4321}`,
-        combo_token: "abcdabcdabcdabcd",
-        data: { guest: "false" },
+        combo_token: 'abcdabcdabcdabcd',
+        data: { guest: 'false' },
         heartbeat: false,
       },
     });
@@ -85,11 +88,11 @@ export class Hk4eGranterHandler extends HttpHandler {
         data: string;
       };
     }>,
-    res: HttpResponse
+    res: HttpResponse,
   ) {
     res.send({
       retcode: 0,
-      message: "OK",
+      message: 'OK',
       data: {
         modified: true,
         protocol: {
@@ -97,11 +100,11 @@ export class Hk4eGranterHandler extends HttpHandler {
           app_id: 4,
           major: 4,
           minimum: 0,
-          create_time: "0",
-          language: "en",
-          priv_proto: "",
-          user_proto: "",
-          teenager_proto: "",
+          create_time: '0',
+          language: 'en',
+          priv_proto: '',
+          user_proto: '',
+          teenager_proto: '',
         },
       },
     });

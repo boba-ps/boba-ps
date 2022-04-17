@@ -1,7 +1,0 @@
-export enum RegionType {
-	REGION_PRODUCT = 0,
-	REGION_EXAM = 1,
-	REGION_DEV_PUB = 2,
-	REGION_DEV_PRI = 3
-}
-

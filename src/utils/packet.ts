@@ -1,4 +1,4 @@
-import kcp from 'node-kcp';
+import type kcp from 'node-kcp';
 // eslint-disable-next-line import/no-unresolved
 import * as dataUtil from './dataUtil';
 

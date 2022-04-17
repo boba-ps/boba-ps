@@ -1,6 +1,0 @@
-export enum GadgetGuestBanDrop {
-	GADGET_GUEST_BAN_NONE = 0,
-	GADGET_GUEST_BAN_DIE_LUA = 1,
-	GADGET_GUEST_BAN_SUBFIELD = 2
-}
-

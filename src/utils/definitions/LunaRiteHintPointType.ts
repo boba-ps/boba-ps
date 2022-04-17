@@ -1,6 +1,0 @@
-export enum LunaRiteHintPointType {
-	LUNA_RITE_HINT_TYPE_NONE = 0,
-	LUNA_RITE_HINT_TYPE_RUNE = 1,
-	LUNA_RITE_HINT_TYPE_CHEST = 2
-}
-

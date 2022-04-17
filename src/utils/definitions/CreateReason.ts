@@ -1,6 +1,0 @@
-export enum CreateReason {
-	CREATE_NONE = 0,
-	CREATE_QUEST = 1,
-	CREATE_ENERGY = 2
-}
-

@@ -1,6 +1,0 @@
-export enum BargainResultType {
-	BARGAIN_COMPLETE_SUCC = 0,
-	BARGAIN_SINGLE_FAIL = 1,
-	BARGAIN_COMPLETE_FAIL = 2
-}
-

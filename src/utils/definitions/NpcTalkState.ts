@@ -1,6 +1,0 @@
-export enum NpcTalkState {
-	NPC_TALK_NONE = 0,
-	NPC_TALK_AUTO = 1,
-	NPC_TALK_MANUAL = 2
-}
-

@@ -1,7 +1,0 @@
-export enum CreateGadgetReason {
-	CREATE_GADGET_NONE = 0,
-	CREATE_GADGET_PLAYER = 1,
-	CREATE_GADGET_MISSION = 2,
-	CREATE_GADGET_GM = 3
-}
-

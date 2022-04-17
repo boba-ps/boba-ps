@@ -1,12 +1,14 @@
-import { fastify, FastifyReply, FastifyRequest } from "fastify";
-import type { RouteGenericInterface } from "fastify/types/route";
+/* eslint-disable no-use-before-define */
+/* eslint-disable max-classes-per-file */
+import { fastify, FastifyReply, FastifyRequest } from 'fastify';
+import type { RouteGenericInterface } from 'fastify/types/route';
 import type {
   Http2SecureServer,
   Http2ServerRequest,
   Http2ServerResponse,
-} from "http2";
-import { Log } from "../log";
-import type { TlsCert } from "./tls";
+} from 'http2';
+import { Log } from '../log';
+import type { TlsCert } from './tls';
 
 export type HttpRequest<RouteInterface = RouteGenericInterface> =
   FastifyRequest<RouteInterface, Http2SecureServer, Http2ServerRequest>;
@@ -19,6 +21,7 @@ export type HttpResponse<RouteInterface = RouteGenericInterface> = FastifyReply<
 >;
 
 export abstract class HttpHandler {
+  // eslint-disable-next-line no-unused-vars
   abstract setup(server: HttpsServer): void;
 }
 

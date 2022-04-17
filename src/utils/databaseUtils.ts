@@ -1,9 +1,11 @@
 /* eslint-disable import/no-unresolved */
 import { PrismaClient } from '@prisma/client';
-import { GetPlayerTokenReq } from './definitions/GetPlayerTokenReq';
-import { AvatarInfo, ItemInfo, PlayerInfo, SceneInfo, TeamInfo, TeamSelectionInfo } from './interfaces';
+import type { GetPlayerTokenReq } from './definitions/GetPlayerTokenReq';
+import type {
+  AvatarInfo, ItemInfo, PlayerInfo, SceneInfo, TeamSelectionInfo,
+} from './interfaces';
 import { Log, LogTypes } from './logging';
-import { Packet } from './packet';
+import type { Packet } from './packet';
 
 export const prismaClient = new PrismaClient();
 
@@ -76,42 +78,4 @@ export class PlayerDataUtil {
     });
     this.itemInfo = data!;
   }
-
-  async editUserInventory(playerUid:number, newItemInfo:ItemInfo) {
-    try {
-      const data = await prismaClient.itemInfo.update({
-        where: {
-          uid: playerUid,
-        },
-        data: newItemInfo,
-      });
-      this.itemInfo = data;
-    } catch (err:any) {
-      Log(`Unable to update player's (${playerUid}) inventory! Reason: ${err}`, LogTypes.Debug);
-    }
-  }
-
-  async TeamSelectionInfo() {
-    const data = await prismaClient.teamSelectionInfo.findFirst({
-      where: {
-        uid: this.reqData.uid,
-      },
-    });
-    this.teamSelectionInfo = data!;
-  }
-
-  async editTeamSelection(playerUid:number, newTeamSelectionInfo:TeamSelectionInfo) {
-    try {
-      const data = await prismaClient.teamSelectionInfo.update({
-        where: {
-          uid: playerUid,
-        },
-        data: newTeamSelectionInfo,
-      });
-      this.TeamSelectionInfo = data;
-    } catch (err:any) {
-      Log(`Unable to update team data! Reason: ${err}`, LogTypes.Debug);
-    }
-  }
-
 }

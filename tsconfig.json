@@ -5,6 +5,7 @@
   },
   "compilerOptions": {
     "target": "ES2016",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "resolveJsonModule": true
   }
 }

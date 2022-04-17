@@ -22,6 +22,8 @@
         "no-bitwise": "off",
         "default-case": "off",
         "no-case-declarations": "off",
-        "no-underscore-dangle": "off"
+        "no-underscore-dangle": "off",
+        "class-methods-use-this": "off",
+        "import/no-unresolved": "off"
     }
 }
