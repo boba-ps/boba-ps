@@ -1,10 +1,12 @@
-import Denque from "denque";
-import { CustomError } from "ts-custom-error";
+import Denque from 'denque';
+import { CustomError } from 'ts-custom-error';
 
 /** Promise that allows an external caller to resolve itself. */
 export class DeferredPromise<T = unknown> {
   readonly then;
+
   readonly catch;
+
   readonly finally;
 
   constructor() {
@@ -19,12 +21,13 @@ export class DeferredPromise<T = unknown> {
   }
 
   resolve(_value: T | PromiseLike<T>) {}
+
   reject(_reason?: any) {}
 }
 
 export class ChannelClosedError extends CustomError {
   constructor() {
-    super("channel is closed");
+    super('channel is closed');
   }
 }
 
@@ -36,7 +39,9 @@ type ChannelItem<T> = {
 /** Unidirectional Promise-based unbounded MPMC FIFO channel. */
 export class Channel<T = unknown> {
   private open = true;
+
   private readonly backlog = new Denque<ChannelItem<T>>();
+
   private readonly waiters = new Denque<DeferredPromise<ChannelItem<T>>>();
 
   /** Sends a single value, waiting asynchronously for it to be received successfully. */

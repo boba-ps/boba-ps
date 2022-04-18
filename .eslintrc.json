@@ -24,6 +24,10 @@
         "no-case-declarations": "off",
         "no-underscore-dangle": "off",
         "class-methods-use-this": "off",
-        "import/no-unresolved": "off"
+        "import/no-unresolved": "off",
+        "no-use-before-define": "off",
+        "no-restricted-syntax": "off",
+        "no-param-reassign": "warn",
+        "radix": "off"
     }
 }

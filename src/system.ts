@@ -1,5 +1,7 @@
-import { Log } from "./log";
-import { CachedClock, Clock, Stopwatch, SystemClock } from "./utils/clock";
+import { Log } from './log';
+import {
+  CachedClock, Clock, Stopwatch, SystemClock,
+} from './utils/clock';
 
 export abstract class ServiceBase<T> {
   protected abstract setup(service: T): void;
@@ -18,6 +20,7 @@ class IntervalTask {
 
 export class Executor extends ServiceBase<Executor> {
   readonly clock: Clock;
+
   private readonly clockWrapper;
 
   constructor(clock: Clock) {
@@ -29,8 +32,11 @@ export class Executor extends ServiceBase<Executor> {
   }
 
   private onceTasks: ExecutorTask[] = [];
+
   private frameTasks: ExecutorTask[] = [];
+
   private intervalTasks: IntervalTask[] = [];
+
   private endTasks: ExecutorTask[] = [];
 
   protected setup(parent: Executor) {
@@ -76,10 +82,10 @@ export class Executor extends ServiceBase<Executor> {
     for (const task of tasks) {
       try {
         Promise.resolve(task()).catch((err) => {
-          Log.error({ err }, "unhandled error while executing async task");
+          Log.error({ err }, 'unhandled error while executing async task');
         });
       } catch (err) {
-        Log.error({ err }, "unhandled error while executing task");
+        Log.error({ err }, 'unhandled error while executing task');
       }
     }
   }
@@ -108,15 +114,16 @@ export class Executor extends ServiceBase<Executor> {
 }
 
 export class SystemExecutor extends Executor {
-  private state: "initialized" | "running" | "destroyed" = "initialized";
+  private state: 'initialized' | 'running' | 'destroyed' = 'initialized';
+
   private readonly clockCore;
 
   get running() {
-    return this.state === "running";
+    return this.state === 'running';
   }
 
   get destroyed() {
-    return this.state === "destroyed";
+    return this.state === 'destroyed';
   }
 
   constructor(clock = new SystemClock()) {
@@ -132,7 +139,7 @@ export class SystemExecutor extends Executor {
     let last = this.clockCore.now();
     let compensate = 0;
 
-    while (this.state === "running") {
+    while (this.state === 'running') {
       this.runFrame();
 
       let now = this.clockCore.now();
@@ -156,16 +163,16 @@ export class SystemExecutor extends Executor {
 
   /** Runs this executor indefinitely, until it is destroyed. */
   start(freq: number) {
-    if (this.state !== "initialized") return;
-    this.state = "running";
+    if (this.state !== 'initialized') return;
+    this.state = 'running';
     this.clockCore.start();
     this.run(freq);
   }
 
   /** Stops and destroys this executor. */
   destroy() {
-    if (this.state === "destroyed") return;
-    this.state = "destroyed";
+    if (this.state === 'destroyed') return;
+    this.state = 'destroyed';
     this.clockCore.stop();
     this.runEnd();
   }

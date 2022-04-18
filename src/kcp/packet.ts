@@ -1,9 +1,12 @@
+/* eslint-disable no-empty-function */
+/* eslint-disable no-unused-vars */
 const MAGIC_START = 0x4567;
 const MAGIC_END = 0x89ab;
 
 export class DataPacket {
   static readonly minimumSize = 12;
 
+  // eslint-disable-next-line no-useless-constructor
   constructor(readonly id: number, readonly metadata: Buffer, readonly data: Buffer) {}
 
   static decode(buffer: Buffer) {
@@ -34,6 +37,7 @@ export class DataPacket {
   }
 
   encode() {
+    // eslint-disable-next-line max-len
     const buffer = Buffer.allocUnsafe(DataPacket.minimumSize + this.metadata.length + this.data.length);
 
     buffer.writeUInt16BE(MAGIC_START);

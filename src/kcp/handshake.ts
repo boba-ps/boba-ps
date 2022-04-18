@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 const CONNECT_START = 0x000000ff;
 const CONNECT_END = 0xffffffff;
 const CONNECT_DATA = 1234567890;
@@ -53,6 +54,7 @@ export abstract class HandshakePacket {
 }
 
 export class ConnectPacket extends HandshakePacket {
+  // eslint-disable-next-line no-useless-constructor
   constructor() {
     super();
   }
@@ -63,6 +65,7 @@ export class ConnectPacket extends HandshakePacket {
 }
 
 export class EstablishPacket extends HandshakePacket {
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly conv: number, readonly token: number) {
     super();
   }
@@ -73,6 +76,7 @@ export class EstablishPacket extends HandshakePacket {
 }
 
 export class DisconnectPacket extends HandshakePacket {
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly conv: number, readonly token: number) {
     super();
   }

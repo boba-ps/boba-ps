@@ -1,10 +1,11 @@
-import { fastify, FastifyReply, FastifyRequest } from "fastify";
-import type { RouteGenericInterface } from "fastify/types/route";
-import type { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from "http2";
-import type { Config } from "../config";
-import { Log } from "../log";
-import { Executor, ServiceBase } from "../system";
-import type { TlsCert } from "./tls";
+// eslint-disable-next-line max-classes-per-file
+import { fastify, FastifyReply, FastifyRequest } from 'fastify';
+import type { RouteGenericInterface } from 'fastify/types/route';
+import type { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from 'http2';
+import type { Config } from '../config';
+import { Log } from '../log';
+import { Executor, ServiceBase } from '../system';
+import type { TlsCert } from './tls';
 
 export type HttpRequest<RouteInterface = RouteGenericInterface> = FastifyRequest<
   RouteInterface,
@@ -24,6 +25,7 @@ export abstract class HttpHandler extends ServiceBase<HttpsServer> {}
 export class HttpsServer extends ServiceBase<Executor> {
   readonly http;
 
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config, cert: TlsCert) {
     super();
 
@@ -40,8 +42,8 @@ export class HttpsServer extends ServiceBase<Executor> {
 
   protected setup(exec: Executor) {
     exec.once(async () => {
-      const host = this.config.get("http.host");
-      const port = this.config.get("http.port");
+      const host = this.config.get('http.host');
+      const port = this.config.get('http.port');
 
       await this.http.listen(port, host);
     });

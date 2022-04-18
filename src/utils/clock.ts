@@ -45,14 +45,14 @@ export class CachedClock extends Clock {
 
 export class Stopwatch extends Clock {
   private running = false;
+
   private stored = 0;
 
   now() {
     if (this.running) {
       return this.base.now() - this.stored;
-    } else {
-      return this.stored;
     }
+    return this.stored;
   }
 
   constructor(readonly base: Clock) {

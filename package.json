@@ -38,14 +38,12 @@
     "fastify": "^3.27.4",
     "json5": "^2.2.1",
     "kcp-ts": "./kcp",
-    "node-kcp": "^1.0.12",
     "pino": "^7.10.0",
     "pino-pretty": "^7.6.1",
     "prisma": "^3.11.0",
     "protobufjs": "^6.11.2",
     "ts-custom-error": "^3.2.0",
     "ts-node": "^10.7.0",
-    "ts-proto": "^1.110.2",
     "yaml": "^2.0.1"
   }
 }

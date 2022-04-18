@@ -1,19 +1,23 @@
-import { cloneBuffer, Ec2bKey, xorBuffer } from "../crypto";
-import { MT19937_64 } from "../crypto/mt64";
-import { Log } from "../log";
-import { ConnectPacket, DisconnectPacket, EstablishPacket, HandshakePacket } from "./handshake";
-import { getConv, getToken, Kcp } from "kcp-ts";
-import { UdpPacket, UdpServer } from "./udp";
-import type { Clock } from "../utils/clock";
-import type { Config } from "../config";
-import { CustomError } from "ts-custom-error";
-import { Executor, ServiceBase } from "../system";
-import { DataPacket } from "./packet";
-import { PacketRouter } from "./router";
+/* eslint-disable max-classes-per-file */
+import { getConv, getToken, Kcp } from 'kcp-ts';
+import { CustomError } from 'ts-custom-error';
+import { cloneBuffer, Ec2bKey, xorBuffer } from '../crypto';
+import { MT19937_64 } from '../crypto/mt64';
+import { Log } from '../log';
+import {
+  ConnectPacket, DisconnectPacket, EstablishPacket, HandshakePacket,
+} from './handshake';
+import { UdpPacket, UdpServer } from './udp';
+import type { Clock } from '../utils/clock';
+import type { Config } from '../config';
+import { Executor, ServiceBase } from '../system';
+import { DataPacket } from './packet';
+import { PacketRouter } from './router';
 
 export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 
 export class KcpError extends CustomError {
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly code: number, message?: string) {
     super(message);
   }
@@ -21,28 +25,32 @@ export class KcpError extends CustomError {
 
 export class KcpServer extends ServiceBase<Executor> {
   readonly udp;
+
   readonly connections;
+
   readonly router;
 
   // optimization
   readonly sharedBuffer;
+
   readonly sharedMt;
 
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config, readonly clock: Clock, readonly ec2b: Ec2bKey) {
     super();
 
-    this.udp = new UdpServer({ type: "udp4" });
+    this.udp = new UdpServer({ type: 'udp4' });
     this.connections = new KcpConnectionManager(this);
     this.router = new PacketRouter();
 
-    this.sharedBuffer = Buffer.alloc(config.get("kcp.recvBufSize"));
+    this.sharedBuffer = Buffer.alloc(config.get('kcp.recvBufSize'));
     this.sharedMt = new MT19937_64();
   }
 
   protected setup(exec: Executor) {
     exec.once(async () => {
-      const host = this.config.get("kcp.host");
-      const port = this.config.get("kcp.port");
+      const host = this.config.get('kcp.host');
+      const port = this.config.get('kcp.port');
 
       await this.udp.bind(host, port);
       Log.info(`Server listening at udp://${host}:${port}`);
@@ -59,7 +67,7 @@ export class KcpServer extends ServiceBase<Executor> {
             this.handleKcpPacket(packet);
           }
         } catch {
-          Log.error({ packet }, "unhandled error in udp packet handler");
+          Log.error({ packet }, 'unhandled error in udp packet handler');
         }
       }
     });
@@ -75,7 +83,7 @@ export class KcpServer extends ServiceBase<Executor> {
 
   private handleHandshake({ address, port }: UdpPacket, handshake: HandshakePacket) {
     if (handshake instanceof ConnectPacket) {
-      Log.trace({ handshake }, "received connect handshake");
+      Log.trace({ handshake }, 'received connect handshake');
 
       const connection = this.connections.create(address, port);
       const response = new EstablishPacket(connection.conv, connection.token);
@@ -83,9 +91,9 @@ export class KcpServer extends ServiceBase<Executor> {
       connection.sendRaw(response.encode());
     } else if (handshake instanceof DisconnectPacket) {
       // TODO: handle disconnect
-      Log.trace({ handshake }, "received disconnect handshake");
+      Log.trace({ handshake }, 'received disconnect handshake');
     } else {
-      Log.debug({ handshake }, "ignored unexpected handshake");
+      Log.debug({ handshake }, 'ignored unexpected handshake');
     }
   }
 
@@ -98,30 +106,34 @@ export class KcpServer extends ServiceBase<Executor> {
       const read = connection.kcp.input(buffer);
 
       if (read === -1 || read === -2 || read === -3) {
-        if (Log.isLevelEnabled("debug")) {
+        if (Log.isLevelEnabled('debug')) {
           Log.debug(
-            { buffer: buffer.toString("hex"), address, port, conv, token, read },
-            "received malformed kcp packet"
+            {
+              buffer: buffer.toString('hex'), address, port, conv, token, read,
+            },
+            'received malformed kcp packet',
           );
         }
 
         return;
       }
 
-      if (Log.isLevelEnabled("trace")) {
-        Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "processed kcp packet");
+      if (Log.isLevelEnabled('trace')) {
+        Log.trace({
+          buffer: buffer.toString('hex'), address, port, conv, token,
+        }, 'processed kcp packet');
       }
 
       for (const packet of connection) {
         this.handleDataPacket(connection, packet);
       }
-    } else {
-      if (Log.isLevelEnabled("trace")) {
-        Log.trace(
-          { buffer: buffer.toString("hex"), address, port, conv, token },
-          "ignored kcp packet from unknown connection"
-        );
-      }
+    } else if (Log.isLevelEnabled('trace')) {
+      Log.trace(
+        {
+          buffer: buffer.toString('hex'), address, port, conv, token,
+        },
+        'ignored kcp packet from unknown connection',
+      );
     }
   }
 
@@ -130,18 +142,18 @@ export class KcpServer extends ServiceBase<Executor> {
 
     if (packet) {
       this.router.handle(connection, packet);
-    } else {
-      if (Log.isLevelEnabled("debug")) {
-        Log.debug({ buffer: buffer.toString("hex"), connection }, "received malformed data packet");
-      }
+    } else if (Log.isLevelEnabled('debug')) {
+      Log.debug({ buffer: buffer.toString('hex'), connection }, 'received malformed data packet');
     }
   }
 }
 
 export class KcpConnectionManager {
   private readonly store: Record<string, KcpConnection[]> = {};
+
   private readonly rand = new MT19937_64();
 
+  // eslint-disable-next-line no-unused-vars
   constructor(readonly server: KcpServer) {
     this.rand.seed(BigInt(Date.now()));
   }
@@ -158,6 +170,7 @@ export class KcpConnectionManager {
   }
 
   get(address: string, port: number, conv: number, token: number) {
+    // eslint-disable-next-line max-len
     return (this.store[address] || []).find((c) => c.port === port && c.conv === conv && c.token === token);
   }
 
@@ -168,7 +181,7 @@ export class KcpConnectionManager {
     }
   }
 
-  *[Symbol.iterator]() {
+  * [Symbol.iterator]() {
     for (const connections of Object.values(this.store)) {
       for (const connection of connections) {
         yield connection;
@@ -205,15 +218,19 @@ export class KcpConnectionEncryptor {
 
 export class KcpConnection {
   readonly kcp;
+
   readonly encryptor;
 
   constructor(
     readonly manager: KcpConnectionManager,
+    // eslint-disable-next-line no-unused-vars
     readonly clock: Clock,
+    // eslint-disable-next-line no-unused-vars
     readonly address: string,
+    // eslint-disable-next-line no-unused-vars
     readonly port: number,
     readonly conv: number,
-    readonly token: number
+    readonly token: number,
   ) {
     this.kcp = new Kcp(conv, token, (buffer) => {
       // kcp buffer must be cloned because it is reused internally
@@ -252,11 +269,12 @@ export class KcpConnection {
         return;
 
       case -3:
-        throw new KcpError(read, "kcp read buffer is too small");
+        throw new KcpError(read, 'kcp read buffer is too small');
     }
 
     const decrypted = cloneBuffer(buffer.slice(0, read));
     this.encryptor.cipher(decrypted);
+    // eslint-disable-next-line consistent-return
     return decrypted;
   }
 
@@ -265,8 +283,9 @@ export class KcpConnection {
     this.kcp.flush();
   }
 
-  *[Symbol.iterator]() {
+  * [Symbol.iterator]() {
     let packet;
+    // eslint-disable-next-line no-cond-assign
     while ((packet = this.recv())) {
       yield packet;
     }
