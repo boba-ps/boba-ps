@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 import { printTitle } from "./utils/title";
 import { HttpsServer } from "./http";
 import { Config, loadConfig } from "./config";
-import { readTlsCert } from "./http/tls";
-import { readEc2bKey } from "./crypto";
+import { TlsCert } from "./http/tls";
+import { Ec2bKey } from "./crypto";
 import { GlobalDispatchHandler } from "./http/dispatchGlobal";
 import { RegionDispatchHandler } from "./http/dispatchRegion";
 import { Hk4eShieldHandler } from "./http/hk4eShield";
@@ -25,8 +25,8 @@ async function start(clock: Clock, config: Config) {
 
   printTitle();
 
-  const tls = await readTlsCert(config);
-  const ec2b = await readEc2bKey(config);
+  const tls = new TlsCert(config);
+  const ec2b = new Ec2bKey(config);
 
   new SystemExecutor(clock)
     .register(

@@ -11,7 +11,6 @@ import { Executor, ServiceBase } from "../system";
 import { DataPacket } from "./packet";
 import { PacketRouter } from "./router";
 import { Session } from "./session";
-import { writeFileSync } from "fs";
 
 export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 

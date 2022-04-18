@@ -1,7 +1,7 @@
 import { QueryRegionListHttpRsp, RegionSimpleInfo } from "boba-protos";
 import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
 import type { Config } from "../config";
-import { cipherEc2b, Ec2bKey } from "../crypto";
+import type { Ec2bKey } from "../crypto";
 
 export class GlobalDispatchHandler extends HttpHandler {
   constructor(readonly config: Config, readonly ec2b: Ec2bKey) {
@@ -31,8 +31,7 @@ export class GlobalDispatchHandler extends HttpHandler {
     const regionList = QueryRegionListHttpRsp.create({
       regionList: [region],
       clientSecretKey: this.ec2b.ec2b,
-      clientCustomConfigEncrypted: cipherEc2b(
-        this.ec2b,
+      clientCustomConfigEncrypted: this.ec2b.cipher(
         Buffer.from(
           JSON.stringify({
             sdkenv: 2,
