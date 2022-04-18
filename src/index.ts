@@ -15,7 +15,8 @@ import { KcpServer } from "./kcp";
 import { Clock, SystemClock } from "./utils/clock";
 import { Log } from "./log";
 import { SystemExecutor } from "./system";
-import { PingReqHandler } from "./kcp/handlers/PingReq";
+import { PingHandler } from "./kcp/handlers/ping";
+import { AuthHandler } from "./kcp/handlers/auth";
 
 dotenv.config();
 
@@ -38,7 +39,7 @@ async function start(clock: Clock, config: Config) {
         .register(new Hk4eShieldHandler(config))
         .register(new Hk4eGranterHandler(config))
     )
-    .register(new KcpServer(config, clock, ec2b).register(new PingReqHandler()))
+    .register(new KcpServer(config, clock, ec2b).register(new PingHandler()).register(new AuthHandler()))
     .start(100);
 }
 

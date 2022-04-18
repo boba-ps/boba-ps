@@ -10,6 +10,8 @@ import type { Config } from "../config";
 import { Executor, ServiceBase } from "../system";
 import { DataPacket } from "./packet";
 import { PacketRouter } from "./router";
+import { Session } from "./session";
+import { writeFileSync } from "fs";
 
 export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 
@@ -75,7 +77,7 @@ export class KcpServer extends ServiceBase<Executor> {
 
   private handleHandshake({ address, port }: UdpPacket, handshake: HandshakePacket) {
     if (handshake instanceof ConnectPacket) {
-      Log.trace({ handshake }, "received connect handshake");
+      Log.debug({ handshake }, "received connect handshake");
 
       const connection = this.connections.create(address, port);
       const response = new EstablishPacket(connection.conv, connection.token);
@@ -83,7 +85,7 @@ export class KcpServer extends ServiceBase<Executor> {
       connection.sendRaw(response.encode());
     } else if (handshake instanceof DisconnectPacket) {
       // TODO: handle disconnect
-      Log.trace({ handshake }, "received disconnect handshake");
+      Log.debug({ handshake }, "received disconnect handshake");
     } else {
       Log.debug({ handshake }, "ignored unexpected handshake");
     }
@@ -109,11 +111,11 @@ export class KcpServer extends ServiceBase<Executor> {
       }
 
       if (Log.isLevelEnabled("trace")) {
-        Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "processed kcp packet");
+        Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "received kcp packet");
       }
 
       for (const packet of connection) {
-        this.handleDataPacket(connection, packet);
+        this.router.handle(connection, packet);
       }
     } else if (Log.isLevelEnabled("trace")) {
       Log.trace(
@@ -122,21 +124,10 @@ export class KcpServer extends ServiceBase<Executor> {
       );
     }
   }
-
-  private handleDataPacket(connection: KcpConnection, buffer: Buffer) {
-    const packet = DataPacket.decode(buffer);
-
-    if (packet) {
-      this.router.handle(connection, packet);
-    } else if (Log.isLevelEnabled("debug")) {
-      Log.debug({ buffer: buffer.toString("hex"), connection }, "received malformed data packet");
-    }
-  }
 }
 
 export class KcpConnectionManager {
   private readonly store: Record<string, KcpConnection[]> = {};
-
   private readonly rand = new MT19937_64();
 
   constructor(readonly server: KcpServer) {
@@ -159,7 +150,7 @@ export class KcpConnectionManager {
   }
 
   update() {
-    for (const connection of this) {
+    for (const connection of [...this]) {
       // TODO: dead connection handling
       connection.kcp.update(connection.clock.now());
     }
@@ -197,13 +188,17 @@ export class KcpConnectionEncryptor {
     for (let i = 0; i < 0x1000; i += 8) {
       this.key.writeBigUInt64BE(mt.next(), i);
     }
+
+    if (Log.isLevelEnabled("trace")) {
+      Log.trace({ seed, key: this.key.toString("hex") }, "kcp connection encryptor seeded");
+    }
   }
 }
 
 export class KcpConnection {
   readonly kcp;
-
   readonly encryptor;
+  readonly session;
 
   constructor(
     readonly manager: KcpConnectionManager,
@@ -215,47 +210,73 @@ export class KcpConnection {
   ) {
     this.kcp = new Kcp(conv, token, (buffer) => {
       // kcp buffer must be cloned because it is reused internally
-      this.sendRaw(cloneBuffer(buffer));
+      buffer = cloneBuffer(buffer);
+
+      if (Log.isLevelEnabled("trace")) {
+        Log.trace({ buffer: buffer.toString("hex"), address, port, conv, token }, "sending kcp packet");
+      }
+
+      this.sendRaw(buffer);
     });
 
     this.kcp.setWndSize(1024, 1024);
     this.encryptor = new KcpConnectionEncryptor(manager.server);
+    this.session = new Session();
   }
 
   get connected() {
     return !this.kcp.isDeadLink();
   }
 
-  /** Sends the given packet on the KCP connection. */
-  send(buffer: Buffer) {
-    const encrypted = cloneBuffer(buffer);
+  /** Sends the given packet. */
+  send(packet: DataPacket) {
+    const encrypted = packet.encode();
     this.encryptor.cipher(encrypted);
     this.kcp.send(encrypted);
   }
 
-  /** Sends the given packet directly on the underlying UDP "connection". */
+  /** Sends the given buffer directly on the underlying UDP "connection". */
   sendRaw(buffer: Buffer) {
     return this.manager.server.udp.send({ buffer, address: this.address, port: this.port });
   }
 
-  /** Receives a single KCP packet. */
+  /** Receives a single packet. */
   recv() {
-    const buffer = this.manager.server.sharedBuffer;
-    const read = this.kcp.recv(buffer);
+    for (;;) {
+      const buffer = this.manager.server.sharedBuffer;
+      const read = this.kcp.recv(buffer);
 
-    switch (read) {
-      case -1:
-      case -2:
-        // nothing in rcv_queue
-        return;
+      switch (read) {
+        case -1:
+        case -2:
+          // nothing in rcv_queue
+          return;
 
-      case -3:
-        throw new KcpError(read, "kcp read buffer is too small");
+        case -3:
+          throw new KcpError(read, "kcp read buffer is too small");
+      }
+
+      const decrypted = cloneBuffer(buffer.slice(0, read));
+      this.encryptor.cipher(decrypted);
+
+      const packet = DataPacket.decode(decrypted);
+
+      if (packet) {
+        return packet;
+      } else {
+        if (Log.isLevelEnabled("debug")) {
+          Log.debug({ read, buffer: decrypted.toString("hex") }, "received malformed data packet");
+        }
+
+        // writeFileSync(`./badpacket${Date.now()}`, decrypted);
+
+        // malformed data packet; log this and try the next packet in rcv_queue
+        // this may sometimes happen during connection establishment when we send GetPlayerTokenRsp
+        // and reseed the encryptor while the another packet encrypted with the original ec2b key
+        // is already in transit.
+        continue;
+      }
     }
-
-    const decrypted = cloneBuffer(buffer.slice(0, read));
-    this.encryptor.cipher(decrypted);
-    return decrypted;
   }
 
   /** Flushes all pending data in the KCP send buffer. */
