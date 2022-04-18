@@ -20,7 +20,7 @@ export class SceneHandler extends KcpHandler {
     server.router.on(SceneInitFinishReq, this.sceneInitFinish.bind(this));
   }
 
-  sceneInitFinish({ res }: PacketContext<SceneInitFinishReq>) {
+  sceneInitFinish({ req, res }: PacketContext<SceneInitFinishReq> ) {
     res.send(WorldDataNotify, {
       worldPropMap: {
         1: {
@@ -99,7 +99,7 @@ export class SceneHandler extends KcpHandler {
         authorityPeerId: 1,
         abilityInfo: {},
       },
-      enterSceneToken: 1000,
+      enterSceneToken: req.enterSceneToken,
     });
 
     res.send(PlayerGameTimeNotify, {
@@ -108,7 +108,7 @@ export class SceneHandler extends KcpHandler {
     });
 
     res.send(SceneTimeNotify, {
-      sceneId: 1,
+      sceneId: 3,
     });
 
     res.send(SceneDataNotify, {
@@ -139,9 +139,8 @@ export class SceneHandler extends KcpHandler {
         },
       ],
     });
-
     res.send(SceneInitFinishRsp, {
-      enterSceneToken: 1000,
+      enterSceneToken: req.enterSceneToken
     });
   }
 }
