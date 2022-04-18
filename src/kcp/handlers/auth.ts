@@ -1,9 +1,11 @@
 import {
   AvatarDataNotify,
+  EnterType,
   GetPlayerTokenReq,
   GetPlayerTokenRsp,
   OpenStateUpdateNotify,
   PlayerDataNotify,
+  PlayerEnterSceneNotify,
   PlayerLoginReq,
   PlayerLoginRsp,
   PlayerStoreNotify,
@@ -286,590 +288,45 @@ export class AuthHandler extends KcpHandler {
           lifeState: 1,
           equipGuidList: [2785642601942876207n, 2785642601942876162n],
           fightPropMap: {
-            "1": 987.4696044921875,
-            "3": 0.03099999949336052,
-            "4": 42.53106689453125,
-            "6": 0,
-            "7": 61.97467041015625,
-            "20": 0.05000000074505806,
-            "21": 0,
-            "22": 0.5,
-            "23": 1,
-            "26": 0,
-            "27": 0,
-            "28": 0,
-            "29": 0,
-            "30": 0,
-            "40": 0,
-            "41": 0,
-            "42": 0,
-            "43": 0,
-            "44": 0,
-            "45": 0,
-            "46": 0,
-            "50": 0,
-            "51": 0,
-            "52": 0,
-            "53": 0,
-            "54": 0,
-            "55": 0,
-            "56": 0,
-            "74": 60,
-            "1010": 979.8616333007812,
-            "2000": 1018.0811767578125,
-            "2001": 42.53106689453125,
-            "2002": 61.97467041015625,
-            "2003": 0,
+            1: 987.4696044921875,
+            3: 0.03099999949336052,
+            4: 42.53106689453125,
+            6: 0,
+            7: 61.97467041015625,
+            20: 0.05000000074505806,
+            21: 0,
+            22: 0.5,
+            23: 1,
+            26: 0,
+            27: 0,
+            28: 0,
+            29: 0,
+            30: 0,
+            40: 0,
+            41: 0,
+            42: 0,
+            43: 0,
+            44: 0,
+            45: 0,
+            46: 0,
+            50: 0,
+            51: 0,
+            52: 0,
+            53: 0,
+            54: 0,
+            55: 0,
+            56: 0,
+            74: 60,
+            1010: 979.8616333007812,
+            2000: 1018.0811767578125,
+            2001: 42.53106689453125,
+            2002: 61.97467041015625,
+            2003: 0,
           },
           skillDepotId: 704,
           fetterInfo: {
             expLevel: 1,
-            fetterList: [
-              {
-                fetterId: 2124,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2123,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2122,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2121,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2120,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2119,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2118,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2117,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2116,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2115,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2114,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2113,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2112,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2111,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2110,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2109,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2108,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2107,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2106,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2105,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2303,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2104,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2302,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2103,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2301,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2102,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2101,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2046,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2045,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2044,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2019,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2018,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2017,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2016,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2015,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2014,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2013,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2012,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2011,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2010,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2009,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2207,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2008,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2200,
-                fetterState: 2,
-              },
-              {
-                fetterId: 2001,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2098,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2201,
-                fetterState: 2,
-              },
-              {
-                fetterId: 2002,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2099,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2401,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2202,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2003,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2100,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2402,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2203,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2004,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2403,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2204,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2005,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2205,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2006,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2206,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2007,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2020,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2021,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2035,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2036,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2037,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2038,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2039,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2043,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2034,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2032,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2042,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2041,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2040,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2033,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2078,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2031,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2030,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2029,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2028,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2027,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2026,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2025,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2024,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2023,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2022,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2047,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2048,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2049,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2050,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2051,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2052,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2053,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2054,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2055,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2056,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2057,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2058,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2059,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2060,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2061,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2062,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2063,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2064,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2065,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2066,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2067,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2068,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2069,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2070,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2071,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2072,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2073,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2074,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2075,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2076,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2077,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2079,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2080,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2081,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2084,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2085,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2086,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2087,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2088,
-                fetterState: 3,
-              },
-              {
-                fetterId: 2089,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2090,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2091,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2092,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2093,
-                fetterState: 1,
-              },
-              {
-                fetterId: 105,
-                fetterState: 2,
-              },
-              {
-                fetterId: 2095,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2096,
-                fetterState: 1,
-              },
-              {
-                fetterId: 2097,
-                fetterState: 1,
-              },
-            ],
+            fetterList: [],
           },
           skillLevelMap: {
             10067: 1,
@@ -903,9 +360,25 @@ export class AuthHandler extends KcpHandler {
       ownedCostumeList: [200302, 202101, 204101, 204501],
     });
 
+    res.send(PlayerEnterSceneNotify, {
+      sceneId: 3,
+      pos: {
+        x: 2527.529052734375,
+        y: 215.549072265625,
+        z: -1287.1180419921875,
+      },
+      sceneBeginTime: 1650278548732n,
+      type: EnterType.ENTER_SELF,
+      targetUid: 6064,
+      enterSceneToken: 1000,
+      isFirstLoginEnterScene: true,
+      sceneTagIdList: [102, 107, 113, 117, 125, 134, 139, 141],
+      enterReason: 1,
+      worldType: 1,
+      sceneTransaction: "3-648582960-1650278548-67458",
+    });
+
     res.send(PlayerLoginRsp, {
-      isUseAbilityHash: true,
-      abilityHashCode: 557879627,
       gameBiz: "hk4e_global",
       isScOpen: true,
       registerCps: "mihoyo",
