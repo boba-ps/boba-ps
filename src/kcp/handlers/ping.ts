@@ -3,8 +3,10 @@ import { KcpHandler, KcpServer } from "..";
 
 export class PingHandler extends KcpHandler {
   protected setup(server: KcpServer) {
-    server.router.on(PingReq, (req, res) => {
-      res.send(PingRsp, { clientTime: req.clientTime });
+    server.router.on(PingReq, ({ req, res }) => {
+      res.send(PingRsp, {
+        clientTime: req.clientTime,
+      });
     });
   }
 }

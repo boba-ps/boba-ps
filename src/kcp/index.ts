@@ -29,7 +29,7 @@ export class KcpServer extends ServiceBase<Executor> {
   readonly sharedBuffer;
   readonly sharedMt;
 
-  constructor(readonly config: Config, readonly clock: Clock, readonly ec2b: Ec2bKey) {
+  constructor(readonly config: Config, readonly ec2b: Ec2bKey) {
     super();
 
     this.udp = new UdpServer({ type: "udp4" });
@@ -55,9 +55,9 @@ export class KcpServer extends ServiceBase<Executor> {
           const handshake = HandshakePacket.decode(packet.buffer);
 
           if (handshake) {
-            this.handleHandshake(packet, handshake);
+            this.handleHandshake(exec, packet, handshake);
           } else {
-            this.handleKcpPacket(packet);
+            this.handleKcpPacket(exec, packet);
           }
         } catch {
           Log.error({ packet }, "unhandled error in udp packet handler");
@@ -74,11 +74,11 @@ export class KcpServer extends ServiceBase<Executor> {
     });
   }
 
-  private handleHandshake({ address, port }: UdpPacket, handshake: HandshakePacket) {
+  private handleHandshake(exec: Executor, { address, port }: UdpPacket, handshake: HandshakePacket) {
     if (handshake instanceof ConnectPacket) {
       Log.debug({ handshake }, "received connect handshake");
 
-      const connection = this.connections.create(address, port);
+      const connection = this.connections.create(exec.clock, address, port);
       const response = new EstablishPacket(connection.conv, connection.token);
 
       connection.sendRaw(response.encode());
@@ -90,7 +90,7 @@ export class KcpServer extends ServiceBase<Executor> {
     }
   }
 
-  private handleKcpPacket({ buffer, address, port }: UdpPacket) {
+  private handleKcpPacket(exec: Executor, { buffer, address, port }: UdpPacket) {
     const conv = getConv(buffer);
     const token = getToken(buffer);
     const connection = this.connections.get(address, port, conv, token);
@@ -114,7 +114,7 @@ export class KcpServer extends ServiceBase<Executor> {
       }
 
       for (const packet of connection) {
-        this.router.handle(connection, packet);
+        this.router.handle(exec, connection, packet);
       }
     } else if (Log.isLevelEnabled("trace")) {
       Log.trace(
@@ -133,8 +133,7 @@ export class KcpConnectionManager {
     this.rand.seed(BigInt(Date.now()));
   }
 
-  create(address: string, port: number) {
-    const clock = this.server.clock.withStart(0);
+  create(clock: Clock, address: string, port: number) {
     const id = this.rand.next();
     const conv = Number(id >> 32n);
     const token = Number(id & 0xffffffffn);

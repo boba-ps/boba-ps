@@ -2,19 +2,15 @@ import type { MessageType, PartialMessage } from "@protobuf-ts/runtime";
 import { PacketHead } from "boba-protos";
 import type { KcpConnection } from ".";
 import { Log } from "../log";
+import type { Executor } from "../system";
 import { DataPacket } from "./packet";
 import packetIds from "./packetIds.json";
 
 export function getPacketId(name: string) {
-  const id = (packetIds as Record<string, string>)[name];
-  return id ? parseInt(id) : undefined;
+  return (packetIds as Record<string, number>)[name];
 }
 
-export type PacketRouterCallback<T extends object> = (
-  message: T,
-  reply: PacketRouterReplyHandler,
-  connection: KcpConnection
-) => Promise<void> | void;
+export type PacketRouterCallback<T extends object> = (context: PacketContext<T>) => Promise<void> | void;
 
 type Route<T extends object> = {
   type: MessageType<T>;
@@ -34,9 +30,11 @@ export class PacketRouter {
     } else {
       Log.warn({ name }, `ignored route handler for packet ${name} with unmapped id`);
     }
+
+    return this;
   }
 
-  handle(connection: KcpConnection, packet: DataPacket) {
+  handle(exec: Executor, connection: KcpConnection, packet: DataPacket) {
     const route = this.map[packet.id];
 
     if (!route) {
@@ -45,15 +43,15 @@ export class PacketRouter {
     }
 
     const name = route.type.typeName;
-    let head, body;
+    let header, body;
 
     try {
-      head = PacketHead.fromBinary(packet.metadata);
+      header = PacketHead.fromBinary(packet.metadata);
     } catch (err) {
       if (Log.isLevelEnabled("debug")) {
         Log.debug(
           { id: packet.id, name, buffer: packet.metadata.toString("hex"), err },
-          "failed to decode packet head"
+          "failed to decode packet header"
         );
       }
 
@@ -70,19 +68,19 @@ export class PacketRouter {
       return false;
     }
 
-    // let's do something with the packet head in the future
+    // let's do something with the packet header in the future
     // this line just exists to prevent unused var linting error
-    head;
+    header;
 
     if (Log.isLevelEnabled("debug")) {
-      Log.debug({ id: packet.id, name, head, packet: body }, "received packet");
+      Log.debug({ id: packet.id, name, header, packet: body }, "received packet");
     }
 
     for (const callback of route.callbacks) {
       try {
-        callback(body, new PacketRouterReplyHandler(connection), connection);
+        callback(new PacketContext(exec, header, body, connection));
       } catch (err) {
-        Log.warn({ id: packet.id, packet: body }, "unhandled error in packet router");
+        Log.warn({ id: packet.id, name, header, packet: body, err }, "unhandled error in packet route");
       }
     }
 
@@ -92,10 +90,23 @@ export class PacketRouter {
 
 const EMPTY_BUFFER = Buffer.alloc(0);
 
-export class PacketRouterReplyHandler {
-  constructor(readonly connection: KcpConnection) {}
+export class PacketContext<T extends object> {
+  readonly res;
 
-  send<T extends object>(type: MessageType<T>, message: PartialMessage<T>) {
+  constructor(
+    readonly exec: Executor,
+    readonly header: PacketHead,
+    readonly req: T,
+    readonly connection: KcpConnection
+  ) {
+    this.res = new PacketRouterResponse(this);
+  }
+}
+
+export class PacketRouterResponse<T extends object> {
+  constructor(private readonly context: PacketContext<T>) {}
+
+  send<T extends object>(type: MessageType<T>, message: PartialMessage<T> & { _header?: PartialMessage<PacketHead> }) {
     const name = type.typeName;
     const id = getPacketId(name);
 
@@ -107,8 +118,28 @@ export class PacketRouterReplyHandler {
     // partial to full message
     message = type.create(message);
 
-    let head, body;
-    head = EMPTY_BUFFER;
+    let header, body;
+
+    if (message._header) {
+      try {
+        header = Buffer.from(
+          PacketHead.toBinary(
+            PacketHead.create({
+              sentMs: BigInt(this.context.exec.clock.now() >>> 0),
+              ...message._header,
+            })
+          )
+        );
+      } catch (err) {
+        if (Log.isLevelEnabled("warn")) {
+          Log.warn({ id, name, packet: message, err }, "failed to encode packet header");
+        }
+
+        return false;
+      }
+    } else {
+      header = EMPTY_BUFFER;
+    }
 
     try {
       body = Buffer.from(type.toBinary(message as T));
@@ -124,8 +155,8 @@ export class PacketRouterReplyHandler {
       Log.debug({ id, name, packet: message }, "sending packet");
     }
 
-    this.connection.send(new DataPacket(id, head, body));
-    this.connection.flush();
+    this.context.connection.send(new DataPacket(id, header, body));
+    this.context.connection.flush();
 
     return true;
   }

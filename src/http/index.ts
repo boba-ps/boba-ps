@@ -2,7 +2,7 @@ import { fastify, FastifyReply, FastifyRequest } from "fastify";
 import type { RouteGenericInterface } from "fastify/types/route";
 import type { Http2SecureServer, Http2ServerRequest, Http2ServerResponse } from "http2";
 import type { Config } from "../config";
-import { Log } from "../log";
+// import { Log } from "../log";
 import { Executor, ServiceBase } from "../system";
 import type { TlsCert } from "./tls";
 
@@ -28,7 +28,8 @@ export class HttpsServer extends ServiceBase<Executor> {
     super();
 
     this.http = fastify({
-      logger: Log,
+      // annoying so disabled temporarily
+      // logger: Log,
       http2: true,
       https: {
         allowHTTP1: true,
