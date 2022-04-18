@@ -1,14 +1,13 @@
-/* eslint-disable max-classes-per-file */
-import { AvatarInfo, PrismaClient } from '@prisma/client';
-import type { PlayerInfo } from './interfaces';
-import { Log } from '../log';
+import { AvatarInfo, PrismaClient } from "@prisma/client";
+import type { PlayerInfo } from "./interfaces";
+import { Log } from "../log";
 // Db Access
 export const prismaClient = new PrismaClient();
 
 export class PlayerDataUtil {
-  public uid:number = 1;
+  public uid: number = 1;
 
-  constructor(uid:number) {
+  constructor(uid: number) {
     this.uid = uid;
   }
 
@@ -28,7 +27,7 @@ export class PlayerDataUtil {
     }
   }
 
-  async editPlayerData(playerInfo:PlayerInfo) {
+  async editPlayerData(playerInfo: PlayerInfo) {
     try {
       const data = await prismaClient.playerInfo.update({
         where: {
@@ -47,11 +46,10 @@ export class PlayerDataUtil {
 }
 
 export class AvatarInfoUtil {
-  public uid:number = 1;
+  public uid: number = 1;
+  public avatarInfos?: AvatarInfo[] | undefined | null;
 
-  public avatarInfos?:AvatarInfo[] | undefined | null;
-
-  constructor(uid:number) {
+  constructor(uid: number) {
     this.uid = uid;
     (async () => {
       this.avatarInfos = await this.getAvatarDatasFromUid();
@@ -75,7 +73,7 @@ export class AvatarInfoUtil {
     }
   }
 
-  async updateAvatarData(avatarGuid:number, avatarInfo:AvatarInfo) {
+  async updateAvatarData(avatarGuid: number, avatarInfo: AvatarInfo) {
     try {
       const data = await prismaClient.avatarInfo.update({
         // gonna ts ignore this first cuz yes

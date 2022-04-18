@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 const CONNECT_START = 0x000000ff;
 const CONNECT_END = 0xffffffff;
 const CONNECT_DATA = 1234567890;

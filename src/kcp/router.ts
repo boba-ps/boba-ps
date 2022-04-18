@@ -1,12 +1,9 @@
-/* eslint-disable no-empty-function */
-/* eslint-disable no-unused-vars */
-/* eslint-disable max-classes-per-file */
-import type { MessageType, PartialMessage } from '@protobuf-ts/runtime';
-import { PacketHead } from 'boba-protos';
-import type { KcpConnection } from '.';
-import { Log } from '../log';
-import type { DataPacket } from './packet';
-import packetIds from './packetIds.json';
+import type { MessageType, PartialMessage } from "@protobuf-ts/runtime";
+import { PacketHead } from "boba-protos";
+import type { KcpConnection } from ".";
+import { Log } from "../log";
+import type { DataPacket } from "./packet";
+import packetIds from "./packetIds.json";
 
 export function getPacketId(name: string) {
   const id = (packetIds as Record<string, string>)[name];
@@ -32,7 +29,6 @@ export class PacketRouter {
     const id = getPacketId(packetName);
 
     if (id) {
-      // eslint-disable-next-line no-multi-assign
       const { callbacks } = ((this.map[id] as Route<T>) ??= { type, callbacks: [] });
       callbacks.push(callback);
     } else {
@@ -54,8 +50,8 @@ export class PacketRouter {
     try {
       head = PacketHead.fromBinary(packet.metadata);
     } catch (err) {
-      if (Log.isLevelEnabled('debug')) {
-        Log.debug({ id: packet.id, buffer: packet.metadata.toString('hex'), err }, 'failed to decode packet head');
+      if (Log.isLevelEnabled("debug")) {
+        Log.debug({ id: packet.id, buffer: packet.metadata.toString("hex"), err }, "failed to decode packet head");
       }
 
       return false;
@@ -64,10 +60,10 @@ export class PacketRouter {
     try {
       body = route.type.fromBinary(packet.data);
     } catch (err) {
-      if (Log.isLevelEnabled('warn')) {
+      if (Log.isLevelEnabled("warn")) {
         Log.warn(
-          { id: packet.id, buffer: packet.data.toString('hex'), err },
-          `failed to decode packet ${route.type.typeName}`,
+          { id: packet.id, buffer: packet.data.toString("hex"), err },
+          `failed to decode packet ${route.type.typeName}`
         );
       }
 
@@ -76,14 +72,13 @@ export class PacketRouter {
 
     // let's do something with the packet head in the future
     // this line just exists to prevent unused var linting error
-    // eslint-disable-next-line no-unused-expressions
     head;
 
     for (const callback of route.callbacks) {
       try {
         callback(body, new PacketRouterReplyHandler(connection), connection);
       } catch (err) {
-        Log.warn({ id: packet.id, packet: body }, 'unhandled error in packet router');
+        Log.warn({ id: packet.id, packet: body }, "unhandled error in packet router");
       }
     }
 

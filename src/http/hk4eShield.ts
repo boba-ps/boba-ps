@@ -1,7 +1,5 @@
-import {
-  HttpHandler, HttpRequest, HttpResponse, HttpsServer,
-} from '.';
-import type { Config } from '../config';
+import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
+import type { Config } from "../config";
 
 export class Hk4eShieldHandler extends HttpHandler {
   constructor(readonly config: Config) {
@@ -10,21 +8,21 @@ export class Hk4eShieldHandler extends HttpHandler {
 
   protected setup(server: HttpsServer) {
     server.http
-      .get('/hk4e_global/mdk/shield/api/loadConfig', this.loadConfig.bind(this))
-      .post('/hk4e_global/mdk/shield/api/login', {
+      .get("/hk4e_global/mdk/shield/api/loadConfig", this.loadConfig.bind(this))
+      .post("/hk4e_global/mdk/shield/api/login", {
         schema: {
           body: {
-            uid: { type: 'string' },
-            token: { type: 'string' },
+            uid: { type: "string" },
+            token: { type: "string" },
           },
         },
         handler: this.login.bind(this),
       })
-      .post('/hk4e_global/mdk/shield/api/verify', {
+      .post("/hk4e_global/mdk/shield/api/verify", {
         schema: {
           body: {
-            uid: { type: 'string' },
-            token: { type: 'string' },
+            uid: { type: "string" },
+            token: { type: "string" },
           },
         },
         handler: this.verify.bind(this),
@@ -34,16 +32,16 @@ export class Hk4eShieldHandler extends HttpHandler {
   async loadConfig(_req: HttpRequest, res: HttpResponse) {
     res.send({
       retcode: 0,
-      message: 'OK',
+      message: "OK",
       data: {
         id: 6,
-        game_key: 'hk4e_global',
-        client: 'PC',
-        ignore_versions: '',
+        game_key: "hk4e_global",
+        client: "PC",
+        ignore_versions: "",
         guest: false,
-        identity: 'I_IDENTITY',
-        scene: 'S_NORMAL',
-        name: 'Genshin Impact',
+        identity: "I_IDENTITY",
+        scene: "S_NORMAL",
+        name: "Genshin Impact",
         disable_regist: false,
         enable_email_captcha: false,
         thirdparty: [],
@@ -62,41 +60,41 @@ export class Hk4eShieldHandler extends HttpHandler {
         token?: string;
       };
     }>,
-    res: HttpResponse,
+    res: HttpResponse
   ) {
     res.send({
       retcode: 0,
-      message: 'OK',
+      message: "OK",
       data: {
         account: {
-          uid: '1',
-          name: 'Boba',
-          realname: '',
-          token: 'abcdabcdabcdabcd',
-          email: 'Boba',
-          is_email_verify: '0',
-          area_code: '**',
-          country: 'US',
-          device_grant_ticket: '',
-          reactivate_ticket: '',
-          mobile: '',
-          safe_mobile: '',
-          identity_card: '',
+          uid: "1",
+          name: "Boba",
+          realname: "",
+          token: "abcdabcdabcdabcd",
+          email: "Boba",
+          is_email_verify: "0",
+          area_code: "**",
+          country: "US",
+          device_grant_ticket: "",
+          reactivate_ticket: "",
+          mobile: "",
+          safe_mobile: "",
+          identity_card: "",
 
-          apple_name: '',
-          facebook_name: '',
-          game_center_name: '',
-          google_name: '',
-          sony_name: '',
-          tap_name: '',
-          twitter_name: '',
+          apple_name: "",
+          facebook_name: "",
+          game_center_name: "",
+          google_name: "",
+          sony_name: "",
+          tap_name: "",
+          twitter_name: "",
         },
 
-        realname_operation: 'None',
-        device_grant_required: 'false',
-        safe_moblie_required: 'false',
-        realperson_required: 'false',
-        reactivate_required: 'false',
+        realname_operation: "None",
+        device_grant_required: "false",
+        safe_moblie_required: "false",
+        realperson_required: "false",
+        reactivate_required: "false",
       },
     });
   }

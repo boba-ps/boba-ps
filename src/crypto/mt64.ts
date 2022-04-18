@@ -12,7 +12,8 @@ export class MT19937_64 {
     this.mt[0] = seed & 0xffffffffffffffffn;
 
     for (let i = 1; i < 312; i++) {
-      this.mt[i] = (6364136223846793005n * (this.mt[i - 1]! ^ (this.mt[i - 1]! >> 62n)) + BigInt(i)) & 0xffffffffffffffffn;
+      this.mt[i] =
+        (6364136223846793005n * (this.mt[i - 1]! ^ (this.mt[i - 1]! >> 62n)) + BigInt(i)) & 0xffffffffffffffffn;
     }
 
     this.mti = 312;
@@ -30,7 +31,8 @@ export class MT19937_64 {
         if (k < 312 - 156) {
           this.mt[k] = this.mt[k + 156]! ^ (y >> 1n) ^ ((y & 1n) == 0n ? 0n : 0xb5026f5aa96619e9n);
         } else {
-          this.mt[k] = this.mt[k + 156 - 624 + this.mt.length]! ^ (y >> 1n) ^ ((y & 1n) == 0n ? 0n : 0xb5026f5aa96619e9n);
+          this.mt[k] =
+            this.mt[k + 156 - 624 + this.mt.length]! ^ (y >> 1n) ^ ((y & 1n) == 0n ? 0n : 0xb5026f5aa96619e9n);
         }
       }
 

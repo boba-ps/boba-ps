@@ -1,9 +1,9 @@
-import { readFile } from 'fs/promises';
-import path from 'path';
-import type { Config } from '../config';
+import { readFile } from "fs/promises";
+import path from "path";
+import type { Config } from "../config";
 
-export const DefaultEc2bPath = path.join(__dirname, 'ec2b.bin');
-export const DefaultEc2bKeyPath = path.join(__dirname, 'ec2b.key');
+export const DefaultEc2bPath = path.join(__dirname, "ec2b.bin");
+export const DefaultEc2bKeyPath = path.join(__dirname, "ec2b.key");
 
 export type Ec2bKey = {
   ec2b: Buffer;
@@ -12,8 +12,8 @@ export type Ec2bKey = {
 
 export async function readEc2bKey(config: Config): Promise<Ec2bKey> {
   return {
-    ec2b: await readFile(config.get('ec2b.path')),
-    key: await readFile(config.get('ec2b.keyPath')),
+    ec2b: await readFile(config.get("ec2b.path")),
+    key: await readFile(config.get("ec2b.keyPath")),
   };
 }
 

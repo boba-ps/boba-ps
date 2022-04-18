@@ -1,6 +1,6 @@
-import Denque from 'denque';
-import { createSocket, RemoteInfo, SocketOptions } from 'dgram';
-import { Log } from '../log';
+import Denque from "denque";
+import { createSocket, RemoteInfo, SocketOptions } from "dgram";
+import { Log } from "../log";
 
 export type UdpPacket = {
   buffer: Buffer;
@@ -12,12 +12,11 @@ export class UdpServer {
   readonly socket;
 
   private closed = false;
-
   private readonly recvQueue = new Denque<UdpPacket>();
 
   constructor(options: SocketOptions) {
     this.socket = createSocket(options, this.handleMessage.bind(this));
-    this.socket.on('error', (err) => Log.error({ err }, 'unhandled error on udp socket'));
+    this.socket.on("error", (err) => Log.error({ err }, "unhandled error on udp socket"));
   }
 
   private handleMessage(buffer: Buffer, { address, port }: RemoteInfo) {
@@ -26,7 +25,7 @@ export class UdpServer {
   }
 
   async bind(host: string, port: number) {
-    if (this.closed) throw Error('cannot rebind closed udp socket');
+    if (this.closed) throw Error("cannot rebind closed udp socket");
     await new Promise<void>((res) => this.socket.bind({ port, address: host }, res));
   }
 
@@ -47,7 +46,7 @@ export class UdpServer {
     return this.recvQueue.shift();
   }
 
-  * [Symbol.iterator]() {
+  *[Symbol.iterator]() {
     let packet;
     while ((packet = this.recv())) {
       yield packet;

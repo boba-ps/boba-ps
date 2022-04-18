@@ -1,7 +1,5 @@
-import {
-  HttpHandler, HttpRequest, HttpResponse, HttpsServer,
-} from '.';
-import type { Config } from '../config';
+import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
+import type { Config } from "../config";
 
 export class Hk4eAgreementHandler extends HttpHandler {
   constructor(readonly config: Config) {
@@ -9,13 +7,13 @@ export class Hk4eAgreementHandler extends HttpHandler {
   }
 
   protected setup(server: HttpsServer) {
-    server.http.get('/hk4e_global/mdk/agreement/api/getAgreementInfos', this.getAgreementInfos.bind(this));
+    server.http.get("/hk4e_global/mdk/agreement/api/getAgreementInfos", this.getAgreementInfos.bind(this));
   }
 
   async getAgreementInfos(_req: HttpRequest, res: HttpResponse) {
     res.send({
       retcode: 0,
-      message: 'OK',
+      message: "OK",
       data: {
         marketing_agreements: [],
       },

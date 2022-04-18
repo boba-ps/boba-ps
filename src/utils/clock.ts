@@ -45,7 +45,6 @@ export class CachedClock extends Clock {
 
 export class Stopwatch extends Clock {
   private running = false;
-
   private stored = 0;
 
   now() {

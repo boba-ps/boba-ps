@@ -1,7 +1,5 @@
-import {
-  HttpHandler, HttpRequest, HttpResponse, HttpsServer,
-} from '.';
-import type { Config } from '../config';
+import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
+import type { Config } from "../config";
 
 export class AdminHandler extends HttpHandler {
   constructor(readonly config: Config) {
@@ -10,8 +8,8 @@ export class AdminHandler extends HttpHandler {
 
   protected setup(server: HttpsServer) {
     server.http.get(
-      '/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json',
-      this.version2020030410.bind(this),
+      "/admin/mi18n/plat_oversea/m2020030410/m2020030410-version.json",
+      this.version2020030410.bind(this)
     );
   }
 
