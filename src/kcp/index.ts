@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { getConv, getToken, Kcp } from 'kcp-ts';
 import { CustomError } from 'ts-custom-error';
 import { cloneBuffer, Ec2bKey, xorBuffer } from '../crypto';
@@ -17,7 +16,6 @@ import { PacketRouter } from './router';
 export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 
 export class KcpError extends CustomError {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly code: number, message?: string) {
     super(message);
   }
@@ -35,7 +33,6 @@ export class KcpServer extends ServiceBase<Executor> {
 
   readonly sharedMt;
 
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config, readonly clock: Clock, readonly ec2b: Ec2bKey) {
     super();
 
@@ -153,7 +150,6 @@ export class KcpConnectionManager {
 
   private readonly rand = new MT19937_64();
 
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly server: KcpServer) {
     this.rand.seed(BigInt(Date.now()));
   }
@@ -223,11 +219,8 @@ export class KcpConnection {
 
   constructor(
     readonly manager: KcpConnectionManager,
-    // eslint-disable-next-line no-unused-vars
     readonly clock: Clock,
-    // eslint-disable-next-line no-unused-vars
     readonly address: string,
-    // eslint-disable-next-line no-unused-vars
     readonly port: number,
     readonly conv: number,
     readonly token: number,
@@ -274,7 +267,6 @@ export class KcpConnection {
 
     const decrypted = cloneBuffer(buffer.slice(0, read));
     this.encryptor.cipher(decrypted);
-    // eslint-disable-next-line consistent-return
     return decrypted;
   }
 
@@ -285,7 +277,6 @@ export class KcpConnection {
 
   * [Symbol.iterator]() {
     let packet;
-    // eslint-disable-next-line no-cond-assign
     while ((packet = this.recv())) {
       yield packet;
     }

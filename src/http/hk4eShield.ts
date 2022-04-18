@@ -4,7 +4,6 @@ import {
 import type { Config } from '../config';
 
 export class Hk4eShieldHandler extends HttpHandler {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config) {
     super();
   }

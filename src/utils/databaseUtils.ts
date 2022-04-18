@@ -12,7 +12,6 @@ export class PlayerDataUtil {
     this.uid = uid;
   }
 
-  // eslint-disable-next-line consistent-return
   async getPlayerData() {
     try {
       const data = await prismaClient.playerInfo.findFirst({
@@ -29,7 +28,6 @@ export class PlayerDataUtil {
     }
   }
 
-  // eslint-disable-next-line consistent-return
   async editPlayerData(playerInfo:PlayerInfo) {
     try {
       const data = await prismaClient.playerInfo.update({
@@ -60,7 +58,6 @@ export class AvatarInfoUtil {
     })();
   }
 
-  // eslint-disable-next-line consistent-return
   async getAvatarDatasFromUid() {
     try {
       const data = await prismaClient.avatarInfo.findMany({
@@ -78,7 +75,6 @@ export class AvatarInfoUtil {
     }
   }
 
-  // eslint-disable-next-line consistent-return
   async updateAvatarData(avatarGuid:number, avatarInfo:AvatarInfo) {
     try {
       const data = await prismaClient.avatarInfo.update({

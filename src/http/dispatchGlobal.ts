@@ -6,7 +6,6 @@ import type { Config } from '../config';
 import { cipherEc2b, Ec2bKey } from '../crypto';
 
 export class GlobalDispatchHandler extends HttpHandler {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config, readonly ec2b: Ec2bKey) {
     super();
   }
@@ -22,7 +21,6 @@ export class GlobalDispatchHandler extends HttpHandler {
     res.status(404).send();
   }
 
-  // eslint-disable-next-line max-len
   // query_region_list?version=OSRELWin2.6.0&lang=1&platform=3&binary=1&time=966&channel_id=1&sub_channel_id=0
   async queryRegionList(_req: HttpRequest, res: HttpResponse) {
     const region = RegionSimpleInfo.create({

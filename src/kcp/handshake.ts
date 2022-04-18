@@ -54,7 +54,6 @@ export abstract class HandshakePacket {
 }
 
 export class ConnectPacket extends HandshakePacket {
-  // eslint-disable-next-line no-useless-constructor
   constructor() {
     super();
   }
@@ -65,7 +64,6 @@ export class ConnectPacket extends HandshakePacket {
 }
 
 export class EstablishPacket extends HandshakePacket {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly conv: number, readonly token: number) {
     super();
   }
@@ -76,7 +74,6 @@ export class EstablishPacket extends HandshakePacket {
 }
 
 export class DisconnectPacket extends HandshakePacket {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly conv: number, readonly token: number) {
     super();
   }

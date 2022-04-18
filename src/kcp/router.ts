@@ -92,7 +92,6 @@ export class PacketRouter {
 }
 
 export class PacketRouterReplyHandler {
-  // eslint-disable-next-line no-useless-constructor
   constructor(readonly connection: KcpConnection) {}
 
   send<T extends object>(type: MessageType<T>, message: PartialMessage<T>) {

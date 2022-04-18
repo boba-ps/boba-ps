@@ -6,7 +6,6 @@ import type { Config } from '../config';
 import { cipherEc2b, Ec2bKey } from '../crypto';
 
 export class RegionDispatchHandler extends HttpHandler {
-  // eslint-disable-next-line no-unused-vars
   constructor(readonly config: Config, readonly ec2b: Ec2bKey) {
     super();
   }
@@ -15,7 +14,7 @@ export class RegionDispatchHandler extends HttpHandler {
     server.http.get('/query_cur_region', this.queryCurrRegion.bind(this));
   }
 
-  // eslint-disable-next-line max-len
+
   // query_cur_region?version=OSRELWin2.6.0&lang=1&platform=3&binary=1&time=102&channel_id=1&sub_channel_id=0&account_type=1&dispatchSeed=1e0e352db05bd0a8
   async queryCurrRegion(_req: HttpRequest, res: HttpResponse) {
     const gateserver = this.config.get('kcp.publicAddr');

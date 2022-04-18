@@ -1,8 +1,0 @@
-*.proto
-*.json
-*.sql
-*.prisma
-*.toml
-*.db-journal
-*.db
-*.key
