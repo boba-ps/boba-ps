@@ -1,3 +1,4 @@
+import { randomBytes } from "crypto";
 import type { Db } from ".";
 
 export type Account = {
@@ -5,8 +6,8 @@ export type Account = {
   username: string;
   password: Buffer;
   email: string;
-  session_token: Buffer;
-  login_token: Buffer;
+  session_token?: Buffer;
+  login_token?: Buffer;
 };
 
 export class AccountManager {
@@ -28,5 +29,11 @@ export class AccountManager {
     );
 
     return sx.get({ username });
+  }
+
+  createAccount(accountData:Account) {
+    this.db.sql(
+      `insert into accounts (username, password, email, session_token, login_token) values (${accountData.id}, ${accountData.username}, ${accountData.password}, ${accountData.session_token ?? randomBytes(32)} ${accountData.session_token ?? randomBytes(32)})`
+    )
   }
 }
