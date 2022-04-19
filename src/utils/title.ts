@@ -10,7 +10,7 @@ export function printTitle() {
   const cpuInfo = `${cpuModel[0]} ${os.cpus().length} cores ` + `@ ${(mainCpu?.speed || 0) / 1000}GHz `;
 
   const version = chalk.hex(bobaColor)("| BobaPS ") + chalk.hex(textColor)("v1.0");
-  const authors = chalk.hex(bobaColor)("| With ♡ by ") + chalk.hex(textColor)("Quinella & na.na");
+  const authors = chalk.hex(bobaColor)("| With ♡ by ") + chalk.hex(textColor)("quinella, na.na & phosphene47");
 
   const cpu = chalk.hex(bobaColor).bold("| CPU: ") + cpuInfo;
   const ram = `${chalk.hex(bobaColor).bold("| RAM: ") + Math.floor(os.totalmem() / 1000000000)}GB`;

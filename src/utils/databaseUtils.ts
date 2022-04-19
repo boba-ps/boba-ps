@@ -1,13 +1,12 @@
-import { AvatarInfo, PrismaClient } from "@prisma/client";
-import type { PlayerInfo } from "./interfaces";
-import { Log } from "../log";
+import { AvatarFightProp, AvatarInfo, PrismaClient, PlayerInfo } from '@prisma/client';
+import { Log } from '../log';
 // Db Access
 export const prismaClient = new PrismaClient();
 
 export class PlayerDataUtil {
-  public uid: number = 1;
+  public uid:number = 1;
 
-  constructor(uid: number) {
+  constructor(uid:number) {
     this.uid = uid;
   }
 
@@ -27,7 +26,7 @@ export class PlayerDataUtil {
     }
   }
 
-  async editPlayerData(playerInfo: PlayerInfo) {
+  async editPlayerData(playerInfo:PlayerInfo) {
     try {
       const data = await prismaClient.playerInfo.update({
         where: {
@@ -46,10 +45,11 @@ export class PlayerDataUtil {
 }
 
 export class AvatarInfoUtil {
-  public uid: number = 1;
-  public avatarInfos?: AvatarInfo[] | undefined | null;
+  public uid:number = 1;
 
-  constructor(uid: number) {
+  public avatarInfos?:AvatarInfo[] | undefined | null;
+
+  constructor(uid:number) {
     this.uid = uid;
     (async () => {
       this.avatarInfos = await this.getAvatarDatasFromUid();
@@ -73,7 +73,7 @@ export class AvatarInfoUtil {
     }
   }
 
-  async updateAvatarData(avatarGuid: number, avatarInfo: AvatarInfo) {
+  async updateAvatarData(avatarGuid:number, avatarInfo:AvatarInfo) {
     try {
       const data = await prismaClient.avatarInfo.update({
         // gonna ts ignore this first cuz yes
@@ -90,4 +90,50 @@ export class AvatarInfoUtil {
       Log.warn(`Cannot update data from uid | ${this.uid}`);
     }
   }
+}
+
+export class AvatarFightPropUtil {
+  public guid!:number
+
+  constructor(guid:number) {
+    this.guid = guid;
+  }
+
+  async getAvatarFightProp() {
+    try {
+      const data = await prismaClient.avatarFightProp.findFirst({
+        where: {
+          guid: this.guid
+        }
+      });
+
+      if (data !== null) {
+        return data;
+      }
+      return null;
+    } catch {
+      Log.warn(`Cannot get data from guid | ${this.guid}`);
+    }
+  }
+
+  async editAvatarFightProp(newData:AvatarFightProp) {
+    try {
+      const data = await prismaClient.avatarFightProp.update({
+        where: {
+          // @ts-expect-error
+          guid: this.guid
+        },
+        data: newData
+      });
+
+      if (data !== null) return data;
+      return null;
+    } catch {
+      Log.warn(`Cannot update data from guid | ${this.guid}`);
+    }
+  }
+}
+
+export class AvatarPropUtil {
+  
 }
