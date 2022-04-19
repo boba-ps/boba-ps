@@ -2,7 +2,5 @@
 
 /.env
 /.env.*
-*.db
-*.db-journal
-*.sql
-migration_lock.toml
+
+/boba.db*

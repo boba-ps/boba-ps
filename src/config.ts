@@ -117,6 +117,15 @@ export const ConfigSchema = {
       arg: "kcp-recv-buf-size",
     },
   },
+
+  db: {
+    path: {
+      doc: "Path to the SQLite3 database.",
+      default: "./boba.db",
+      env: "BB_DB_PATH",
+      arg: "db-path",
+    },
+  },
 };
 
 export class Config {

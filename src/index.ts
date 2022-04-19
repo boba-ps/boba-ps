@@ -18,15 +18,19 @@ import { AuthHandler } from "./kcp/handlers/auth";
 import { SceneHandler } from "./kcp/handlers/scene";
 import { SocialHandler } from "./kcp/handlers/social";
 import { ShopHandler } from "./kcp/handlers/shop";
+import { Db } from "./db";
 
 const config = new Config();
-const tls = new TlsCert(config);
-const ec2b = new Ec2bKey(config);
 
 Log.level = config.get("logLevel");
 
+const tls = new TlsCert(config);
+const ec2b = new Ec2bKey(config);
+const db = new Db(config);
+
 new SystemExecutor()
   .register(new TitlePrinter())
+  .register(db)
   .register(
     new HttpsServer(config, tls)
       .register(new AdminHandler(config))
@@ -40,7 +44,7 @@ new SystemExecutor()
   .register(
     new KcpServer(config, ec2b)
       .register(new PingHandler())
-      .register(new AuthHandler())
+      .register(new AuthHandler(db))
       .register(new SceneHandler())
       .register(new SocialHandler())
       .register(new ShopHandler())
