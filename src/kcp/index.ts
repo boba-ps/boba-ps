@@ -65,7 +65,7 @@ export class KcpServer extends ServiceBase<Executor> {
       }
     });
 
-    exec.every(100, () => {
+    exec.every(10, () => {
       this.connections.update();
     });
 

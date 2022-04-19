@@ -3,56 +3,57 @@ import { PacketHead } from "boba-protos";
 import type { KcpConnection } from ".";
 import { Log } from "../log";
 import type { Executor } from "../system";
+import { IdMapping } from "../utils/mapping";
 import { DataPacket } from "./packet";
 import packetIds from "./packetIds.json";
 
-export function getPacketId(name: string) {
-  return (packetIds as Record<string, number>)[name];
-}
-
-export type PacketRouterCallback<T extends object> = (context: PacketContext<T>) => Promise<void> | void;
+export type PacketHandler<T extends object> = (context: PacketContext<T>) => Promise<void> | void;
 
 type Route<T extends object> = {
   type: MessageType<T>;
-  callbacks: PacketRouterCallback<T>[];
+  handlers: PacketHandler<T>[];
 };
 
 export class PacketRouter {
-  private readonly map: Record<number, Route<any>> = {};
+  readonly idMap = new IdMapping(packetIds);
+  readonly routes: Partial<Record<keyof typeof packetIds, Route<any>>> = {};
 
-  on<T extends object>(type: MessageType<T>, callback: PacketRouterCallback<T>) {
+  on<T extends object>(type: MessageType<T>, handler: PacketHandler<T>) {
     const name = type.typeName;
-    const id = getPacketId(name);
 
-    if (id) {
-      const { callbacks } = ((this.map[id] as Route<T>) ??= { type, callbacks: [] });
-      callbacks.push(callback);
+    if (this.idMap.hasName(name)) {
+      const { handlers } = ((this.routes[name] as Route<T>) ??= { type, handlers: [] });
+      handlers.push(handler);
     } else {
-      Log.warn({ name }, `ignored route handler for packet ${name} with unmapped id`);
+      Log.warn({ name }, `ignored handler for packet ${name} with unmapped id`);
     }
 
     return this;
   }
 
   handle(exec: Executor, connection: KcpConnection, packet: DataPacket) {
-    const route = this.map[packet.id];
+    const id = packet.id;
+    const name = this.idMap.name(id);
 
-    if (!route) {
-      Log.info({ id: packet.id }, `ignored unknown packet id ${packet.id}`);
+    if (!name) {
+      Log.info({ id }, `ignored unmapped packet id ${id}`);
       return false;
     }
 
-    const name = route.type.typeName;
+    const route = this.routes[name];
+
+    if (!route || !route.handlers.length) {
+      Log.info({ id, name }, `ignored packet ${name} with no handler`);
+      return false;
+    }
+
     let header, body;
 
     try {
       header = PacketHead.fromBinary(packet.metadata);
     } catch (err) {
       if (Log.isLevelEnabled("debug")) {
-        Log.debug(
-          { id: packet.id, name, buffer: packet.metadata.toString("hex"), err },
-          "failed to decode packet header"
-        );
+        Log.debug({ id, name, buffer: packet.metadata.toString("hex"), err }, "failed to decode packet header");
       }
 
       return false;
@@ -62,7 +63,7 @@ export class PacketRouter {
       body = route.type.fromBinary(packet.data);
     } catch (err) {
       if (Log.isLevelEnabled("warn")) {
-        Log.warn({ id: packet.id, name, buffer: packet.data.toString("hex"), err }, `failed to decode packet ${name}`);
+        Log.warn({ id, name, buffer: packet.data.toString("hex"), err }, `failed to decode packet ${name}`);
       }
 
       return false;
@@ -73,14 +74,14 @@ export class PacketRouter {
     header;
 
     if (Log.isLevelEnabled("debug")) {
-      Log.debug({ id: packet.id, name, header, packet: body }, "received packet");
+      Log.debug({ id, name, header, packet: body }, "received packet");
     }
 
-    for (const callback of route.callbacks) {
+    for (const handler of route.handlers) {
       try {
-        callback(new PacketContext(exec, header, body, connection));
+        handler(new PacketContext(this, exec, header, body, connection));
       } catch (err) {
-        Log.warn({ id: packet.id, name, header, packet: body, err }, "unhandled error in packet route");
+        Log.warn({ id, name, header, packet: body, err }, "unhandled error in packet handler");
       }
     }
 
@@ -94,6 +95,7 @@ export class PacketContext<T extends object> {
   readonly res;
 
   constructor(
+    readonly router: PacketRouter,
     readonly exec: Executor,
     readonly header: PacketHead,
     readonly req: T,
@@ -108,12 +110,13 @@ export class PacketRouterResponse<T extends object> {
 
   send<T extends object>(type: MessageType<T>, message: PartialMessage<T> & { _header?: PartialMessage<PacketHead> }) {
     const name = type.typeName;
-    const id = getPacketId(name);
 
-    if (!id) {
+    if (!this.context.router.idMap.hasName(name)) {
       Log.warn({ name, packet: message }, `ignoring sending packet ${name} with unmapped id`);
       return false;
     }
+
+    const id = this.context.router.idMap.id(name);
 
     // partial to full message
     message = type.create(message);
