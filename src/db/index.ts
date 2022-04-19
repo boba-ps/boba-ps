@@ -41,8 +41,8 @@ export class Db extends ServiceBase<Executor> {
     this.players = new PlayerManager(this);
   }
 
-  protected setup(exec: Executor) {
-    exec.once(() => {
+  protected setup(executor: Executor) {
+    executor.once(() => {
       this.transaction(() => this.migrations.migrate()).exclusive();
     });
   }

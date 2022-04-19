@@ -38,15 +38,15 @@ export class HttpsServer extends ServiceBase<Executor> {
     });
   }
 
-  protected setup(exec: Executor) {
-    exec.once(async () => {
+  protected setup(executor: Executor) {
+    executor.once(async () => {
       const host = this.config.get("http.host");
       const port = this.config.get("http.port");
 
       await this.http.listen(port, host);
     });
 
-    exec.end(async () => {
+    executor.end(async () => {
       await this.http.close();
     });
   }

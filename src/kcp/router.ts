@@ -31,7 +31,7 @@ export class PacketRouter {
     return this;
   }
 
-  handle(exec: Executor, connection: KcpConnection, packet: DataPacket) {
+  handle(executor: Executor, connection: KcpConnection, packet: DataPacket) {
     const id = packet.id;
     const name = this.idMap.name(id);
 
@@ -79,7 +79,7 @@ export class PacketRouter {
 
     for (const handler of route.handlers) {
       try {
-        handler(new PacketContext(this, exec, header, body, connection));
+        handler(new PacketContext(this, executor, header, body, connection));
       } catch (err) {
         Log.warn({ id, name, header, packet: body, err }, "unhandled error in packet handler");
       }
@@ -96,7 +96,7 @@ export class PacketContext<T extends object> {
 
   constructor(
     readonly router: PacketRouter,
-    readonly exec: Executor,
+    readonly executor: Executor,
     readonly header: PacketHead,
     readonly req: T,
     readonly connection: KcpConnection
@@ -128,7 +128,7 @@ export class PacketRouterResponse<T extends object> {
         header = Buffer.from(
           PacketHead.toBinary(
             PacketHead.create({
-              sentMs: BigInt(this.context.exec.clock.now() >>> 0),
+              sentMs: BigInt(this.context.executor.clock.now() >>> 0),
               ...message._header,
             })
           )

@@ -6,8 +6,8 @@ const bobaColor = "#f9d6b8";
 const textColor = "#fdb25a";
 
 export class TitlePrinter extends ServiceBase<Executor> {
-  protected setup(exec: Executor) {
-    exec.once(this.print.bind(this));
+  protected setup(executor: Executor) {
+    executor.once(this.print.bind(this));
   }
 
   print() {

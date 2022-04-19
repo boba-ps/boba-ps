@@ -10,7 +10,6 @@ import type { Config } from "../config";
 import { Executor, ServiceBase } from "../system";
 import { DataPacket } from "./packet";
 import { PacketRouter } from "./router";
-import { Session } from "./session";
 
 export abstract class KcpHandler extends ServiceBase<KcpServer> {}
 
@@ -40,8 +39,8 @@ export class KcpServer extends ServiceBase<Executor> {
     this.sharedMt = new MT19937_64();
   }
 
-  protected setup(exec: Executor) {
-    exec.once(async () => {
+  protected setup(executor: Executor) {
+    executor.once(async () => {
       const host = this.config.get("kcp.host");
       const port = this.config.get("kcp.port");
 
@@ -49,15 +48,15 @@ export class KcpServer extends ServiceBase<Executor> {
       Log.info(`Server listening at udp://${host}:${port}`);
     });
 
-    exec.tick(() => {
+    executor.tick(() => {
       for (const packet of this.udp) {
         try {
           const handshake = HandshakePacket.decode(packet.buffer);
 
           if (handshake) {
-            this.handleHandshake(exec, packet, handshake);
+            this.handleHandshake(executor, packet, handshake);
           } else {
-            this.handleKcpPacket(exec, packet);
+            this.handleKcpPacket(executor, packet);
           }
         } catch {
           Log.error({ packet }, "unhandled error in udp packet handler");
@@ -65,20 +64,20 @@ export class KcpServer extends ServiceBase<Executor> {
       }
     });
 
-    exec.every(10, () => {
+    executor.every(10, () => {
       this.connections.update();
     });
 
-    exec.end(async () => {
+    executor.end(async () => {
       await this.udp.close();
     });
   }
 
-  private handleHandshake(exec: Executor, { address, port }: UdpPacket, handshake: HandshakePacket) {
+  private handleHandshake(executor: Executor, { address, port }: UdpPacket, handshake: HandshakePacket) {
     if (handshake instanceof ConnectPacket) {
       Log.debug({ handshake }, "received connect handshake");
 
-      const connection = this.connections.create(exec.clock, address, port);
+      const connection = this.connections.create(executor.clock, address, port);
       const response = new EstablishPacket(connection.conv, connection.token);
 
       connection.sendRaw(response.encode());
@@ -90,7 +89,7 @@ export class KcpServer extends ServiceBase<Executor> {
     }
   }
 
-  private handleKcpPacket(exec: Executor, { buffer, address, port }: UdpPacket) {
+  private handleKcpPacket(executor: Executor, { buffer, address, port }: UdpPacket) {
     const conv = getConv(buffer);
     const token = getToken(buffer);
     const connection = this.connections.get(address, port, conv, token);
@@ -114,7 +113,7 @@ export class KcpServer extends ServiceBase<Executor> {
       }
 
       for (const packet of connection) {
-        this.router.handle(exec, connection, packet);
+        this.router.handle(executor, connection, packet);
       }
     } else if (Log.isLevelEnabled("trace")) {
       Log.trace(
@@ -149,8 +148,11 @@ export class KcpConnectionManager {
 
   update() {
     for (const connection of [...this]) {
-      // TODO: dead connection handling
       connection.kcp.update(connection.clock.now());
+
+      if (!connection.connected) {
+        // TODO: dead connection handling
+      }
     }
   }
 
@@ -196,7 +198,8 @@ export class KcpConnectionEncryptor {
 export class KcpConnection {
   readonly kcp;
   readonly encryptor;
-  readonly session;
+
+  session?: KcpSession;
 
   constructor(
     readonly manager: KcpConnectionManager,
@@ -219,7 +222,6 @@ export class KcpConnection {
 
     this.kcp.setWndSize(1024, 1024);
     this.encryptor = new KcpConnectionEncryptor(manager.server);
-    this.session = new Session();
   }
 
   get connected() {
@@ -288,4 +290,8 @@ export class KcpConnection {
       yield packet;
     }
   }
+}
+
+export class KcpSession {
+  constructor(readonly accountId: number, readonly playerId: number) {}
 }
