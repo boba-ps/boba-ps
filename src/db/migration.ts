@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "fs";
 import path from "path";
 import type { Db } from ".";
 import { Log } from "../log";
-import { SchemaVersion } from "./config";
+import { SchemaVersionKey } from "./config";
 
 export class MigrationManager {
   constructor(readonly db: Db) {}
@@ -19,12 +19,12 @@ export class MigrationManager {
   }
 
   migrate() {
-    const current = this.db.config.get(SchemaVersion) || 0;
+    const current = this.db.config.get(SchemaVersionKey);
     const pending = this.versions().filter((version) => version > current);
 
     for (const version of pending) {
       this.apply(version);
-      this.db.config.set(SchemaVersion, version);
+      this.db.config.set(SchemaVersionKey, version);
     }
   }
 }

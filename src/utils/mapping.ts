@@ -1,5 +1,5 @@
 /** Strongly typed name/id lookup table. */
-export class IdMapping<Name extends string, Id extends string | number> {
+export class IdMapping<Name extends string | number, Id extends string | number> {
   readonly idToName = {} as Record<Id, Name>;
 
   constructor(readonly nameToId: Record<Name, Id>) {
@@ -12,11 +12,11 @@ export class IdMapping<Name extends string, Id extends string | number> {
     return this.idToName[id];
   }
 
-  asName(name: string) {
+  asName(name: string | number) {
     return this.hasName(name) ? name : undefined;
   }
 
-  hasName(name: string): name is Name {
+  hasName(name: string | number): name is Name {
     return name in this.nameToId;
   }
 

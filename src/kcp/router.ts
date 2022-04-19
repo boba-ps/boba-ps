@@ -5,7 +5,7 @@ import { Log } from "../log";
 import type { Executor } from "../system";
 import { IdMapping } from "../utils/mapping";
 import { DataPacket } from "./packet";
-import packetIds from "./packetIds.json";
+import PacketIds from "./packetIds.json";
 
 export type PacketHandler<T extends object> = (context: PacketContext<T>) => Promise<void> | void;
 
@@ -15,8 +15,8 @@ type Route<T extends object> = {
 };
 
 export class PacketRouter {
-  readonly idMap = new IdMapping(packetIds);
-  readonly routes: Partial<Record<keyof typeof packetIds, Route<any>>> = {};
+  readonly idMap = new IdMapping(PacketIds);
+  readonly routes: Partial<Record<keyof typeof PacketIds, Route<any>>> = {};
 
   on<T extends object>(type: MessageType<T>, handler: PacketHandler<T>) {
     const name = type.typeName;

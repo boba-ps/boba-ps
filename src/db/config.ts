@@ -1,9 +1,18 @@
 import type { Db } from ".";
+import type StoreWeightLimits from "../game/player/weightLimits.json";
 
 // please, i need associated types in typescript...
-export type ConfigKey<T> = { key: string; _value?: T };
+export type ConfigKey<T> = { key: string; default: T };
 
-export const SchemaVersion: ConfigKey<number> = { key: "schema_version" };
+export const SchemaVersionKey: ConfigKey<number> = {
+  key: "schema_version",
+  default: 0,
+};
+
+export const StoreWeightLimitsKey: ConfigKey<Partial<typeof StoreWeightLimits>> = {
+  key: "store_weight_limits",
+  default: {},
+};
 
 // this is different from src/config.ts: it's saved in the db instead of loaded on startup
 export class ConfigManager {
@@ -16,14 +25,14 @@ export class ConfigManager {
     );
   }
 
-  get<T>({ key }: ConfigKey<T>): T | undefined {
+  get<T>({ key, default: def }: ConfigKey<T>): T {
     const sx = this.db.sql(
       `select value from config
        where key = $key`
     );
 
     const entry = sx.get({ key });
-    return typeof entry === "undefined" ? undefined : JSON.parse(entry.value);
+    return typeof entry === "undefined" ? def : JSON.parse(entry.value);
   }
 
   set<T>({ key }: ConfigKey<T>, value: T) {

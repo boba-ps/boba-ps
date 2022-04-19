@@ -6,6 +6,8 @@ import { Log } from "../log";
 import { MigrationManager } from "./migration";
 import { ConfigManager } from "./config";
 import { AccountManager } from "./account";
+import { StoreManager } from "./store";
+import { AvatarManager } from "./avatar";
 
 export class Db extends ServiceBase<Executor> {
   readonly connection;
@@ -14,6 +16,8 @@ export class Db extends ServiceBase<Executor> {
   readonly migrations;
   readonly accounts;
   readonly players;
+  readonly avatars;
+  readonly stores;
 
   constructor(config: Config) {
     super();
@@ -37,8 +41,12 @@ export class Db extends ServiceBase<Executor> {
 
     this.config = new ConfigManager(this);
     this.migrations = new MigrationManager(this);
+
+    // account <- player <- avatar / store
     this.accounts = new AccountManager(this);
     this.players = new PlayerManager(this);
+    this.avatars = new AvatarManager(this);
+    this.stores = new StoreManager(this);
   }
 
   protected setup(executor: Executor) {
