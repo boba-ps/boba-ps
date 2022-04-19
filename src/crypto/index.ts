@@ -1,26 +1,24 @@
-import { readFile } from "fs/promises";
+import { readFileSync } from "fs";
 import path from "path";
 import type { Config } from "../config";
 
 export const DefaultEc2bPath = path.join(__dirname, "ec2b.bin");
 export const DefaultEc2bKeyPath = path.join(__dirname, "ec2b.key");
 
-export type Ec2bKey = {
-  ec2b: Buffer;
-  key: Buffer;
-};
+export class Ec2bKey {
+  readonly ec2b;
+  readonly key;
 
-export async function readEc2bKey(config: Config): Promise<Ec2bKey> {
-  return {
-    ec2b: await readFile(config.get("ec2b.path")),
-    key: await readFile(config.get("ec2b.keyPath")),
-  };
-}
+  constructor(config: Config) {
+    this.ec2b = readFileSync(config.get("ec2b.path"));
+    this.key = readFileSync(config.get("ec2b.keyPath"));
+  }
 
-export function cipherEc2b(ec2b: Ec2bKey, buffer: Buffer) {
-  const other = cloneBuffer(buffer);
-  xorBuffer(ec2b.key, other);
-  return other;
+  cipher(buffer: Buffer) {
+    buffer = cloneBuffer(buffer);
+    xorBuffer(this.key, buffer);
+    return buffer;
+  }
 }
 
 export function cloneBuffer(buffer: Buffer) {

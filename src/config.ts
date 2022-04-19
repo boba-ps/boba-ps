@@ -1,9 +1,12 @@
+import dotenv from "dotenv";
 import convict, { addParser, addFormats } from "convict";
 import formats from "convict-format-with-validator";
 import yaml from "yaml";
 import json5 from "json5";
 import { DefaultTlsKeyPath, DefaultTlsPath } from "./http/tls";
 import { DefaultEc2bPath, DefaultEc2bKeyPath } from "./crypto";
+
+dotenv.config();
 
 addFormats(formats);
 addParser({ extension: ["json", "json5"], parse: json5.parse });
@@ -116,18 +119,28 @@ export const ConfigSchema = {
   },
 };
 
-export type Config = ReturnType<typeof loadConfig>;
+export class Config {
+  readonly convict;
+  readonly get;
+  readonly set;
 
-export function loadConfig() {
-  const config = convict(ConfigSchema);
+  constructor() {
+    this.convict = convict(ConfigSchema);
+    this.get = this.convict.get.bind(this.convict);
+    this.set = this.convict.set.bind(this.convict);
 
-  for (const path of [`./config.${config.get("env")}.json`, `./config.${config.get("env")}.yaml`]) {
-    try {
-      config.loadFile(path);
-    } catch {
-      // allow missing files
+    for (const path of [`./config.${this.get("env")}.json`, `./config.${this.get("env")}.yaml`]) {
+      this.load(path);
     }
+
+    this.convict.validate({ allowed: "strict" });
   }
 
-  return config.validate({ allowed: "strict" });
+  load(path: string) {
+    try {
+      this.convict.loadFile(path);
+    } catch {
+      // ignore missing files
+    }
+  }
 }
