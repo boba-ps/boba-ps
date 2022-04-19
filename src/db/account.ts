@@ -4,7 +4,9 @@ export type Account = {
   id: number;
   username: string;
   password: Buffer;
-  token: Buffer;
+  email: string;
+  session_token: Buffer;
+  login_token: Buffer;
 };
 
 export class AccountManager {
@@ -17,5 +19,14 @@ export class AccountManager {
     );
 
     return sx.get({ id });
+  }
+
+  getByName(username: string): Account | undefined {
+    const sx = this.db.sql(
+      `select * from accounts
+       where username = $username`
+    );
+
+    return sx.get({ username });
   }
 }

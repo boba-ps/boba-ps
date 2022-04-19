@@ -14,8 +14,6 @@ export class AdminHandler extends HttpHandler {
   }
 
   async version2020030410(_req: HttpRequest, res: HttpResponse) {
-    res.send({
-      version: 54,
-    });
+    res.send({ version: 54 });
   }
 }

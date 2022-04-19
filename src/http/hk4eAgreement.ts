@@ -11,12 +11,10 @@ export class Hk4eAgreementHandler extends HttpHandler {
   }
 
   async getAgreementInfos(_req: HttpRequest, res: HttpResponse) {
-    res.send({
-      retcode: 0,
-      message: "OK",
-      data: {
-        marketing_agreements: [],
-      },
-    });
+    const data = {
+      marketing_agreements: [],
+    };
+
+    res.send({ retcode: 0, message: "OK", data });
   }
 }

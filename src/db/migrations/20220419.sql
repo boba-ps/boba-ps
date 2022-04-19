@@ -2,7 +2,9 @@ create table accounts (
   id            integer     primary key,
   username      text        not null,
   password      blob        not null,
-  token         blob        not null
+  email         text        not null,
+  session_token blob        not null,
+  login_token   blob        not null
 );
 
 create unique index ix_accounts_username on accounts (username);
@@ -17,8 +19,8 @@ create table players (
 create index ix_players_account_id on players (account_id);
 
 -- temporary
-insert into accounts (id, username, password, token)
-values (1, 'boba', zeroblob(0), zeroblob(0));
+insert into accounts (id, username, password, email, session_token, login_token)
+values (1, 'Boba', zeroblob(0), 'boba@mihoyo.com', randomblob(32), randomblob(32));
 
 insert into players (id, account_id, nickname)
-values (6064, 1, 'boba');
+values (6064, 1, 'Boba');
