@@ -4,6 +4,6 @@
 [submodule "kcp"]
 	path = kcp
 	url = git@github.com:boba-ps/kcp-ts.git
-[submodule "GenshinData"]
-	path = GenshinData
+[submodule "data"]
+	path = data
 	url = https://github.com/Dimbreath/GenshinData
