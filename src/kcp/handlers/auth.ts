@@ -1,3 +1,5 @@
+import { PlayerManager } from './../../db/player';
+import type { Db } from './../../db/index';
 import {
   AvatarDataNotify,
   EnterType,
@@ -16,15 +18,23 @@ import { KcpHandler, KcpServer } from "..";
 import type { PacketContext } from "../router";
 
 export class AuthHandler extends KcpHandler {
+  private db!:Db;
+  private playerManager:PlayerManager = new PlayerManager(this.db);
+
+  constructor(db:Db) {
+    super();
+    this.db = db;
+  }
+
   protected setup(server: KcpServer) {
     server.router.on(GetPlayerTokenReq, this.getPlayerToken.bind(this)).on(PlayerLoginReq, this.playerLogin.bind(this));
   }
-
   getPlayerToken({ req, res, connection }: PacketContext<GetPlayerTokenReq>) {
     const seed = 0x0n;
-
+    const data = this.playerManager.get(parseInt(req.accountUid))!;
+    
     res.send(GetPlayerTokenRsp, {
-      uid: 6064,
+      uid: data.id,
       accountUid: req.accountUid,
       accountType: req.accountType,
       token: req.accountToken,
@@ -38,10 +48,10 @@ export class AuthHandler extends KcpHandler {
 
   playerLogin({ req, res, exec }: PacketContext<PlayerLoginReq>) {
     // TODO: do stuff with login data
-    req;
+    const data = this.playerManager.get(parseInt(req.accountUid))!;
 
     res.send(PlayerDataNotify, {
-      nickName: "Booba",
+      nickName: data.nickname,
       serverTime: BigInt(exec.clock.now() >>> 0),
       regionId: 1,
       propMap: {
@@ -369,7 +379,7 @@ export class AuthHandler extends KcpHandler {
       },
       sceneBeginTime: 1650278548732n,
       type: EnterType.ENTER_SELF,
-      targetUid: 6064,
+      targetUid: data.id,
       enterSceneToken: 1000,
       isFirstLoginEnterScene: true,
       sceneTagIdList: [102, 107, 113, 117, 125, 134, 139, 141],

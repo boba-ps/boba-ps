@@ -116,7 +116,7 @@ export class Hk4eShieldHandler extends HttpHandler {
 
       is_email_verify: "0",
       area_code: "**",
-      country: "US",
+      country: account.country_code,
     };
   }
 }

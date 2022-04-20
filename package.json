@@ -4,9 +4,7 @@
   "description": "Rewritten version of BobaPS with better features",
   "main": "dist/src/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "migrate": "prisma migrate dev --name db --schema ./src/prisma/schema.prisma",
-    "gen-client": "prisma generate --schema=./src/prisma/schema.prisma"
+    "start": "ts-node src/index.ts"
   },
   "repository": "https://github.com/boba-ps/BobaPS-Rewrite",
   "author": "quinella <98860103+quinelladesuu@users.noreply.github.com>",
@@ -18,7 +16,6 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "@prisma/client": "^3.11.1",
     "@protobuf-ts/runtime": "^2.4.0",
     "@tsconfig/strictest": "^1.0.1",
     "@types/better-sqlite3": "^7.5.0",
@@ -36,7 +33,7 @@
     "kcp-ts": "./kcp",
     "pino": "^7.10.0",
     "pino-pretty": "^7.6.1",
-    "prisma": "^3.11.0",
+    "pm2": "^5.2.0",
     "protobufjs": "^6.11.2",
     "ts-custom-error": "^3.2.0",
     "ts-node": "^10.7.0",

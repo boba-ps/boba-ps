@@ -9,7 +9,6 @@ import {
 } from "boba-protos";
 import { KcpHandler, KcpServer } from "..";
 import type { PacketContext } from "../router";
-
 export class SocialHandler extends KcpHandler {
   protected setup(server: KcpServer) {
     server.router
@@ -18,31 +17,24 @@ export class SocialHandler extends KcpHandler {
       .on(GetPlayerBlacklistReq, this.getPlayerBlacklist.bind(this));
   }
 
-  getPlayerSocialDetail({ req, res }: PacketContext<GetPlayerSocialDetailReq>) {
-    // TODO: fetch player public info
-    if (req.uid === 6064) {
+  getPlayerSocialDetail({ res }: PacketContext<GetPlayerSocialDetailReq>) {
       res.send(GetPlayerSocialDetailRsp, {
         detailData: {
-          uid: 6064,
-          nickname: "Boba",
-          level: 1,
+          uid: 69420,
+          nickname: "BobaGM",
+          level: 60,
           onlineState: FriendOnlineState.FRIEND_ONLINE,
           isFriend: true,
           isMpModeAvailable: true,
           nameCardId: 210001,
           finishAchievementNum: 1,
-          signature: "Test booba account",
+          signature: "BobaGM Bot",
           profilePicture: {
             avatarId: 10000007,
           },
         },
       });
-    } else {
-      res.send(GetPlayerSocialDetailRsp, {
-        retcode: 1,
-      });
     }
-  }
 
   getPlayerFriendList({ res }: PacketContext<GetPlayerFriendListReq>) {
     res.send(GetPlayerFriendListRsp, {});
