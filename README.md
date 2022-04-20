@@ -1,11 +1,6 @@
 # BobaPS-Rewrite
 
-BobaPS is an experimental Genshin Private Server based on Pancake by [NicknameGG](https://github.com/NicknameGG) and written in TypeScript.
-
-## Notes
-
-- Use ``genTypes.ps1`` on src/utils/protos/ directory.
-- Use .editorconfig plugin for VSCode to not let ESLint shout at you.
+BobaPS is an experimental Genshin Private Server written in TypeScript.
 
 ## Documentation
 
@@ -18,14 +13,9 @@ BobaPS is an experimental Genshin Private Server based on Pancake by [NicknameGG
 - [protobufjs](https://www.npmjs.com/package/protobufjs) - Used for serializing/deserializing data sent from the Client to the Server and vice versa.
 - [node-kcp](https://www.npmjs.com/package/node-kcp) - A Fast and Reliable ARQ Protocol
 
-## Credits
-
-- [NicknameGG](https://github.com/NicknameGG) - Original Pancake Source Code
-- [nitrog0d](https://github.com/nitrog0d) - Providing the v2.2 Protobuffers and Packet IDs
-
 ## Usage
 
-(Assuming that you already have Fiddler set up)
+(Assuming that you already have Fiddler/mitmproxy/hosts set up)
 
 1.Clone the Github Repository
 
@@ -47,5 +37,5 @@ yarn
 ```
 
 ```powershell
-yarn start
+yarn start-dev
 ```
