@@ -1,7 +1,7 @@
 import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
 import type { Config } from "../config";
 import type { Db } from "../db";
-import type { Account } from "../db/account";
+import { AccountHandle } from "../game/account";
 
 export class Hk4eShieldHandler extends HttpHandler {
   constructor(readonly config: Config, readonly db: Db) {
@@ -48,7 +48,7 @@ export class Hk4eShieldHandler extends HttpHandler {
     res: HttpResponse
   ) {
     const { account: username } = req.body;
-    const account = this.db.accounts.getByName(username);
+    const account = AccountHandle.fromUsername(this.db, username);
 
     // TODO: decrypt and test password
     if (!account) {
@@ -83,9 +83,9 @@ export class Hk4eShieldHandler extends HttpHandler {
     res: HttpResponse
   ) {
     const { uid, token } = req.body;
-    const account = this.db.accounts.get(parseInt(uid));
+    const account = AccountHandle.fromId(this.db, parseInt(uid));
 
-    if (!account || account.session_token.toString("hex") !== token) {
+    if (!account || !account.isSessionToken(token)) {
       res.send({
         retcode: 1,
         message: "Please log in again",
@@ -107,12 +107,12 @@ export class Hk4eShieldHandler extends HttpHandler {
     res.send({ retcode: 0, message: "OK", data });
   }
 
-  buildAccountData(account: Account) {
+  buildAccountData(account: AccountHandle) {
     return {
       uid: account.id.toString(),
-      name: account.username,
-      token: account.session_token.toString("hex"),
-      email: account.email,
+      name: account.value.username,
+      token: account.value.session_token.toString("hex"),
+      email: account.value.email,
 
       is_email_verify: "0",
       area_code: "**",

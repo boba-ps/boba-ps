@@ -1,6 +1,7 @@
 import { HttpHandler, HttpRequest, HttpResponse, HttpsServer } from ".";
 import type { Config } from "../config";
 import type { Db } from "../db";
+import { AccountHandle } from "../game/account";
 
 export class Hk4eGranterHandler extends HttpHandler {
   constructor(readonly config: Config, readonly db: Db) {
@@ -49,9 +50,9 @@ export class Hk4eGranterHandler extends HttpHandler {
       guest: boolean;
     } = JSON.parse(req.body.data);
 
-    const account = this.db.accounts.get(parseInt(uid));
+    const account = AccountHandle.fromId(this.db, parseInt(uid));
 
-    if (!account || account.session_token.toString("hex") !== token) {
+    if (!account || !account.isSessionToken(token)) {
       res.send({
         retcode: 1,
         message: "Please log in again",
@@ -64,7 +65,7 @@ export class Hk4eGranterHandler extends HttpHandler {
       account_type: "1",
       open_id: account.id,
       combo_id: 1,
-      combo_token: account.login_token.toString("hex"),
+      combo_token: account.value.login_token.toString("hex"),
       data: JSON.stringify({ guest: "false" }),
       heartbeat: false,
     };

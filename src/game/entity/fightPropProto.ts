@@ -5,17 +5,26 @@ export type GenericFightProp = {
   value: number;
 };
 
-export function createFightPropPairProto(prop: GenericFightProp) {
-  const { type, value } = prop;
-  return FightPropPair.create({ propType: type, propValue: value });
-}
-
-export function createFightPropMap(props: GenericFightProp[]) {
-  const map: Record<number, number> = {};
-
-  for (const { type, value } of props) {
-    map[type] = value;
+export class FightPropValueProtoBuilder {
+  static fval(type: number, value: number) {
+    return FightPropPair.create({ propType: type, propValue: value });
   }
 
-  return map;
+  static createPair({ type, value }: GenericFightProp) {
+    return this.fval(type, value);
+  }
+
+  static default(type: number) {
+    return this.fval(type, 0);
+  }
+
+  static createMap(props: GenericFightProp[]) {
+    const map: Record<number, number> = {};
+
+    for (const { type, value } of props) {
+      map[type] = value;
+    }
+
+    return map;
+  }
 }

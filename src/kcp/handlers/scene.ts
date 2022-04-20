@@ -24,14 +24,8 @@ import {
 import { KcpHandler, KcpServer } from "..";
 import type { Db } from "../../db";
 import type { PacketContext } from "../router";
-import { createPropProtoMap } from "../../game/propProto";
-import { createOnlinePlayerInfoProto, createScenePlayerInfoProto } from "../../game/player/playerProto";
-import {
-  createAvatarEnterSceneInfoProto,
-  createAvatarSceneEntityInfoProto,
-  createSceneTeamAvatarProto,
-} from "../../game/entity/avatar/avatarProto";
-import { createAvatarTeamEnterSceneInfoProto } from "../../game/entity/avatar/teamProto";
+import { PlayerHandle } from "../../game/player";
+import { PropValueProtoBuilder } from "../../game/propProto";
 
 export class SceneHandler extends KcpHandler {
   constructor(readonly db: Db) {
@@ -49,26 +43,28 @@ export class SceneHandler extends KcpHandler {
   enterSceneReady({ req, res, connection }: PacketContext<EnterSceneReadyReq>) {
     this.db.transaction(() => {
       if (!connection.session) return;
-      const player = this.db.players.get(connection.session.playerId);
-      const world = player && this.db.worlds.getByJoined(player.id);
+      const player = PlayerHandle.fromId(this.db, connection.session.playerId);
+      const world = player?.getJoinedWorld();
 
-      if (!player || !world || req.enterSceneToken !== player.scene_enter_token) {
+      if (!player || !world || !player.isSceneEnterToken(req.enterSceneToken)) {
         res.send(EnterSceneReadyRsp, { retcode: Retcode.RET_ENTER_SCENE_FAIL });
         return;
       }
 
       // begin player world entrance
-      const peers = this.db.worlds.getPlayers(world.id);
+      const peers = world.getPlayers();
+      const playerPeer = peers.find(({ id }) => id === player.id);
+      const hostPeer = peers.find(({ id }) => id === world.value.owner_id);
 
       res.send(EnterScenePeerNotify, {
-        destSceneId: player.scene_rid,
-        peerId: peers.find(({ id }) => id === player.id)?.peer_index ?? 0,
-        hostPeerId: peers.find(({ id }) => id === world?.owner_id)?.peer_index ?? 0,
-        enterSceneToken: player.scene_enter_token,
+        destSceneId: player.value.scene_rid,
+        peerId: playerPeer ? playerPeer.peerIndex + 1 : 0,
+        hostPeerId: hostPeer ? hostPeer.peerIndex + 1 : 0,
+        enterSceneToken: player.value.scene_enter_token,
       });
 
       res.send(EnterSceneReadyRsp, {
-        enterSceneToken: player.scene_enter_token,
+        enterSceneToken: player.value.scene_enter_token,
       });
     })();
   }
@@ -76,68 +72,42 @@ export class SceneHandler extends KcpHandler {
   sceneInitFinish({ req, res, connection }: PacketContext<SceneInitFinishReq>) {
     this.db.transaction(() => {
       if (!connection.session) return;
-      const player = this.db.players.get(connection.session.playerId);
-      const world = player && this.db.worlds.getByJoined(player.id);
+      const player = PlayerHandle.fromId(this.db, connection.session.playerId);
+      const world = player?.getJoinedWorld();
 
-      if (!player || !world || req.enterSceneToken !== player.scene_enter_token) {
+      if (!player || !world || !player.isSceneEnterToken(req.enterSceneToken)) {
         res.send(EnterSceneReadyRsp, { retcode: Retcode.RET_ENTER_SCENE_FAIL });
         return;
       }
 
       // world properties
-      const worldProps = this.db.worlds.getProps(world.id);
-
       res.send(WorldDataNotify, {
-        worldPropMap: createPropProtoMap(worldProps),
+        worldPropMap: PropValueProtoBuilder.createMap(world.getProps().map((prop) => prop.value)),
       });
 
       // players joined in the world
-      const peers = this.db.worlds.getPlayers(world.id).map((player) => {
-        return {
-          ...player,
-          props: this.db.players.getProps(player.id),
-        };
-      });
+      const peers = world.getPlayers();
 
       res.send(WorldPlayerInfoNotify, {
-        playerInfoList: peers.map(createOnlinePlayerInfoProto),
+        playerInfoList: peers.map((peer) => peer.createOnlineInfoProto()),
         playerUidList: peers.map(({ id }) => id),
       });
 
       res.send(ScenePlayerInfoNotify, {
-        playerInfoList: peers.map(createScenePlayerInfoProto),
+        playerInfoList: peers.map((peer) => peer.createSceneInfoProto()),
       });
 
       // current player team avatar entities
-      const avatars = this.db.avatars.getByPlayer(player.id);
-      const teams = this.db.avatars.getTeamsByPlayer(player.id);
-      const activeTeam = teams[player.active_team] ?? teams[0];
-      const activeTeamEntity = activeTeam ? this.db.entities.getTeamByTeam(activeTeam.id) : undefined;
-
-      const activeTeamAvatars = (activeTeam?.avatar_ids ?? []).map((id) => avatars.find((avatar) => avatar.id === id)!);
-      const activeTeamAvatarEntities = activeTeamAvatars
-        .map((avatar) => {
-          const entity = this.db.entities.getAvatarByAvatar(avatar.id);
-          const weaponEntity = this.db.entities.getWeaponByWeapon(avatar.weapon_id);
-
-          return entity && weaponEntity ? { ...entity, avatar, weaponEntity } : undefined;
-        })
-        .filter((x) => x)
-        .map((x) => x!);
-
-      const activeAvatarId = activeTeam?.avatar_ids[activeTeam.active_avatar] ?? activeTeam?.avatar_ids[0];
-      const activeAvatar = avatars.find(({ id }) => id === activeAvatarId) ?? avatars[0];
-      const activeAvatarEntity = activeAvatar ? this.db.entities.getAvatarByAvatar(activeAvatar.id) : undefined;
-
-      const levelEntity = this.db.entities.getLevelByWorld(world.id);
+      const activeTeam = player.getActiveTeam();
+      const worldOwner = world.getOwnerAsPlayer();
 
       res.send(PlayerEnterSceneInfoNotify, {
-        curAvatarEntityId: activeAvatarEntity?.id ?? 0,
-        avatarEnterInfo: activeTeamAvatarEntities.map(createAvatarEnterSceneInfoProto),
-        teamEnterInfo: activeTeamEntity ? createAvatarTeamEnterSceneInfoProto(activeTeamEntity) : {},
+        curAvatarEntityId: activeTeam.getActiveAvatar()?.getEntity().id ?? 0,
+        avatarEnterInfo: activeTeam.getAvatars().map((avatar) => avatar.createEnterSceneInfoProto()),
+        teamEnterInfo: activeTeam.createEnterSceneInfoProto(),
         mpLevelEntityInfo: {
-          entityId: levelEntity?.id ?? 0,
-          authorityPeerId: peers.find(({ id }) => id === world.owner_id)?.peer_index ?? 0,
+          entityId: world.getLevelEntity().id,
+          authorityPeerId: worldOwner ? worldOwner.peerIndex + 1 : 0,
         },
         enterSceneToken: req.enterSceneToken,
       });
@@ -145,46 +115,27 @@ export class SceneHandler extends KcpHandler {
       // world time
       res.send(PlayerGameTimeNotify, {
         uid: player.id,
-        gameTime: world.time,
+        gameTime: world.value.time,
       });
 
       res.send(SceneTimeNotify, {
-        sceneId: player.scene_rid,
+        sceneId: player.value.scene_rid,
       });
 
       res.send(SceneDataNotify, {});
 
       // world host player
-      const worldOwner = this.db.players.get(world.owner_id)!;
-
       res.send(HostPlayerNotify, {
-        hostUid: worldOwner.id,
-        hostPeerId: peers.find(({ id }) => id === world.owner_id)?.peer_index ?? 0,
+        hostUid: world.getOwner().id,
+        hostPeerId: worldOwner ? worldOwner.peerIndex + 1 : 0,
       });
 
       res.send(SceneTeamUpdateNotify, {
-        sceneTeamAvatarList: peers.flatMap((peer) => {
-          const peerAvatars = this.db.avatars.getByPlayer(peer.id);
-          const peerTeams = this.db.avatars.getTeamsByPlayer(peer.id);
-          const peerActiveTeam = peerTeams[peer.active_team] ?? peerTeams[0];
-          const peerActiveTeamAvatars = (peerActiveTeam?.avatar_ids ?? []).map(
-            (id) => peerAvatars.find((avatar) => avatar.id === id)!
-          );
-
-          return peerActiveTeamAvatars
-            .map((avatar) => {
-              const entity = this.db.entities.getAvatarByAvatar(avatar.id);
-              const weaponEntity = this.db.entities.getWeaponByWeapon(avatar.weapon_id);
-
-              return entity && weaponEntity ? { ...entity, avatar, weaponEntity } : undefined;
-            })
-            .filter((x) => x)
-            .map((entity) => createSceneTeamAvatarProto(player, entity!));
-        }),
+        sceneTeamAvatarList: peers.flatMap((peer) => peer.getAvatars()).map((avatar) => avatar.createSceneTeamProto()),
       });
 
       res.send(SceneInitFinishRsp, {
-        enterSceneToken: player.scene_enter_token,
+        enterSceneToken: player.value.scene_enter_token,
       });
     })();
   }
@@ -192,39 +143,28 @@ export class SceneHandler extends KcpHandler {
   enterSceneDone({ req, res, connection }: PacketContext<EnterSceneDoneReq>) {
     this.db.transaction(() => {
       if (!connection.session) return;
-      const player = this.db.players.get(connection.session.playerId);
-      const world = player && this.db.worlds.getByJoined(player.id);
+      const player = PlayerHandle.fromId(this.db, connection.session.playerId);
+      const world = player?.getJoinedWorld();
 
-      if (!player || !world || req.enterSceneToken !== player.scene_enter_token) {
+      if (!player || !world || !player.isSceneEnterToken(req.enterSceneToken)) {
         res.send(EnterSceneDoneRsp, { retcode: Retcode.RET_ENTER_SCENE_FAIL });
         return;
       }
 
-      const peers = this.db.worlds.getPlayers(world.id);
+      for (const peer of world.getPlayers()) {
+        const avatar = peer.getActiveTeam().getActiveAvatar();
 
-      for (const peer of peers) {
-        const peerAvatars = this.db.avatars.getByPlayer(peer.id);
-        const peerTeams = this.db.avatars.getTeamsByPlayer(peer.id);
-        const peerActiveTeam = peerTeams[peer.active_team] ?? peerTeams[0];
-        const peerActiveTeamAvatars = (peerActiveTeam?.avatar_ids ?? []).map(
-          (id) => peerAvatars.find((avatar) => avatar.id === id)!
-        );
-
-        for (const avatar of peerActiveTeamAvatars) {
-          const entity = this.db.entities.getAvatar(avatar.id);
-
-          if (entity) {
-            res.send(SceneEntityAppearNotify, {
-              entityList: [createAvatarSceneEntityInfoProto({ ...entity, avatar })],
-              // TODO:
-              appearType: VisionType.VISION_BORN,
-            });
-          }
+        if (avatar) {
+          res.send(SceneEntityAppearNotify, {
+            entityList: [avatar.createSceneEntityInfoProto()],
+            // TODO:
+            appearType: VisionType.VISION_BORN,
+          });
         }
       }
 
       res.send(EnterSceneDoneRsp, {
-        enterSceneToken: player.scene_enter_token,
+        enterSceneToken: player.value.scene_enter_token,
       });
     })();
   }
