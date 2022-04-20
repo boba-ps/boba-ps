@@ -2,6 +2,7 @@ import type { Db } from ".";
 
 export type Player = {
   id: number;
+  account_id:number;
   nickname: string;
   signature: string;
   birthday: Date;
@@ -36,7 +37,7 @@ export class PlayerManager {
 
   createPlayer(playerData:Player) : void {
     this.db.sql(
-      `insert into players (nickname, signature, birthday, namecard_id, finish_achievement_num, tower_floor,index, tower_level_index, avatar_id) values (@id, @nickname, @signature, @birthday, @namecard_id, @finish_achievement_num, @tower_floor,index, @tower_level_index, @avatar_id)`
-    ).bind(playerData);
+      `insert into players (id, account_id, nickname, signature, birthday, namecard_id, finish_achievement_num, tower_floor,index, tower_level_index, avatar_id) values (@id, @nickname, @signature, @birthday, @namecard_id, @finish_achievement_num, @tower_floor,index, @tower_level_index, @avatar_id)`
+    ).run(playerData);
   }
 }

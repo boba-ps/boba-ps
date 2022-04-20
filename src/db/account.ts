@@ -2,7 +2,6 @@ import type { Db } from ".";
 
 export type Account = {
   id: number;
-  account_uid:number;
   username: string;
   password: string;
   email: string;
@@ -35,6 +34,6 @@ export class AccountManager {
   createAccount(accountData:Account) : void {
     this.db.sql(
       `insert into accounts (account_uid, username, password, email, session_token, login_token, country_code) values (@account_uid, @username, @password, @login_token @session_token, @country_code)`
-    ).bind(accountData);
+    ).run(accountData);
   }
 }
