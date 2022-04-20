@@ -4,9 +4,7 @@
   "description": "Rewritten version of BobaPS with better features",
   "main": "dist/src/index.js",
   "scripts": {
-    "start-cluster": "pm2 start ts-node src/index.ts -i max",
-    "stop": "pm2 stop all",
-    "start-dev": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts"
   },
   "repository": "https://github.com/boba-ps/BobaPS-Rewrite",
   "author": "quinella <98860103+quinelladesuu@users.noreply.github.com>",
