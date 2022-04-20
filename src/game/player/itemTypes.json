@@ -1,0 +1,8 @@
+{
+  "Virtual": 1,
+  "Material": 2,
+  "Reliquary": 3,
+  "Weapon": 4,
+  "Display": 5,
+  "Furniture": 6
+}

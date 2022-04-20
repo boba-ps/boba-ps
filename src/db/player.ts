@@ -8,9 +8,15 @@ export type Player = {
   signature: string;
   main_char_rid: number;
   region_rid: number;
+  scene_rid: number;
+  scene_enter_token: number;
   active_team: number;
   flycloak_rids: number[];
   costume_rids: number[];
+  pos_x: number;
+  pos_y: number;
+  pos_z: number;
+  world_level: number;
 };
 
 type PlayerEncoded = Omit<Player, "flycloak_rids" | "costume_rids"> & {
@@ -100,5 +106,16 @@ export class PlayerManager {
     );
 
     sx.run(state);
+  }
+
+  nextSceneEnterToken(id: number): number {
+    const sx = this.db.sql(
+      `update players
+       set scene_enter_token = (scene_enter_token + 1) % 10000
+       where id = $id
+       returning scene_enter_token`
+    );
+
+    return sx.get({ id }).scene_enter_token;
   }
 }

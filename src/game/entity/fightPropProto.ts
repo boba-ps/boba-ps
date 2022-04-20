@@ -1,13 +1,13 @@
-import type { FightPropPair } from "boba-protos";
+import { FightPropPair } from "boba-protos";
 
 export type GenericFightProp = {
   type: number;
   value: number;
 };
 
-export function createFightPropPairProto(prop: GenericFightProp): FightPropPair {
+export function createFightPropPairProto(prop: GenericFightProp) {
   const { type, value } = prop;
-  return { propType: type, propValue: value };
+  return FightPropPair.create({ propType: type, propValue: value });
 }
 
 export function createFightPropMap(props: GenericFightProp[]) {

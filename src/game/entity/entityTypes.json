@@ -1,0 +1,15 @@
+{
+  "Avatar": 1,
+  "Monster": 2,
+  "Npc": 3,
+  "Gadget": 4,
+  "Region": 5,
+  "Weapon": 6,
+  "Weather": 7,
+  "Scene": 8,
+  "Team": 9,
+  "Massive": 10,
+  "MpLevel": 11,
+  "PlayTeam": 12,
+  "EyePoint": 13
+}

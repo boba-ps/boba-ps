@@ -1,4 +1,4 @@
-import type { PropValue } from "boba-protos";
+import { PropValue } from "boba-protos";
 
 export type GenericProp = {
   type: number;
@@ -6,32 +6,32 @@ export type GenericProp = {
   fval?: number | null;
 };
 
-export function createPropProto(prop: GenericProp): PropValue {
+export function createPropProto(prop: GenericProp) {
   let { type, ival, fval } = prop;
 
   if (typeof fval === "number") {
-    return {
+    return PropValue.create({
       type,
       val: BigInt(~~fval), // is this correct?
       value: { oneofKind: "fval", fval },
-    };
+    });
   }
 
   if (typeof ival === "number" || typeof ival === "bigint") {
     ival = BigInt(ival);
 
-    return {
+    return PropValue.create({
       type,
       val: ival,
       value: { oneofKind: "ival", ival },
-    };
+    });
   }
 
-  return {
+  return PropValue.create({
     type,
     val: 0n,
     value: { oneofKind: "ival", ival: 0n },
-  };
+  });
 }
 
 export function createPropProtoMap(props: GenericProp[]) {

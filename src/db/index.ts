@@ -6,8 +6,10 @@ import { Log } from "../log";
 import { MigrationManager } from "./migration";
 import { ConfigManager } from "./config";
 import { AccountManager } from "./account";
-import { StoreManager } from "./store";
+import { ItemManager } from "./item";
 import { AvatarManager } from "./avatar";
+import { WorldManager } from "./world";
+import { EntityManager } from "./entity";
 
 export class Db extends ServiceBase<Executor> {
   readonly connection;
@@ -17,13 +19,15 @@ export class Db extends ServiceBase<Executor> {
   readonly accounts;
   readonly players;
   readonly avatars;
-  readonly stores;
+  readonly items;
+  readonly worlds;
+  readonly entities;
 
   constructor(config: Config) {
     super();
 
     this.connection = sqlite3(config.get("db.path"), {
-      verbose: (sql) => Log.debug({ sql }, "executing sql statement"),
+      verbose: (sql) => Log.debug({ sql }, "executed sql statement"),
     });
 
     this.transaction = this.connection.transaction.bind(this.connection);
@@ -41,12 +45,12 @@ export class Db extends ServiceBase<Executor> {
 
     this.config = new ConfigManager(this);
     this.migrations = new MigrationManager(this);
-
-    // account <- player <- avatar / store
     this.accounts = new AccountManager(this);
     this.players = new PlayerManager(this);
     this.avatars = new AvatarManager(this);
-    this.stores = new StoreManager(this);
+    this.items = new ItemManager(this);
+    this.worlds = new WorldManager(this);
+    this.entities = new EntityManager(this);
   }
 
   protected setup(executor: Executor) {

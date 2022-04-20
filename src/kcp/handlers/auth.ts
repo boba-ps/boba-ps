@@ -13,15 +13,16 @@ import {
   StoreType,
   StoreWeightLimitNotify,
 } from "boba-protos";
-import { KcpHandler, KcpServer } from "..";
+import { KcpHandler, KcpServer, KcpSession } from "..";
 import type { Db } from "../../db";
 import { StoreWeightLimitsKey } from "../../db/config";
 import { createAvatarInfoProto } from "../../game/entity/avatar/avatarProto";
 import { createAvatarTeamProtoMap } from "../../game/entity/avatar/teamProto";
-import { createItemProto } from "../../game/player/storeProto";
+import { createItemProto } from "../../game/player/itemProto";
 import StoreWeightLimits from "../../game/player/weightLimits.json";
 import { createPropProtoMap } from "../../game/propProto";
 import type { PacketContext } from "../router";
+import EnterReasons from "../../game/world/enterReasons.json";
 
 export class AuthHandler extends KcpHandler {
   constructor(readonly db: Db) {
@@ -49,6 +50,8 @@ export class AuthHandler extends KcpHandler {
         res.send(GetPlayerTokenRsp, { retcode: Retcode.RET_LOGIN_INIT_FAIL });
         return;
       }
+
+      connection.session = new KcpSession(account.id, player.id);
 
       const seed = connection.manager.server.sharedMt.next();
 
@@ -80,12 +83,14 @@ export class AuthHandler extends KcpHandler {
         return;
       }
 
-      // basic player data
+      // player properties
+      const playerProps = this.db.players.getProps(player.id);
+
       res.send(PlayerDataNotify, {
         nickName: player.nickname,
         serverTime: BigInt(executor.clock.now() >>> 0),
         regionId: player.region_rid,
-        propMap: createPropProtoMap(this.db.players.getProps(player.id)),
+        propMap: createPropProtoMap(playerProps),
       });
 
       // unlocked game features
@@ -111,7 +116,7 @@ export class AuthHandler extends KcpHandler {
       });
 
       // inventory upload
-      const items = this.db.stores.getItemsByPlayer(player.id);
+      const items = this.db.items.getItemsByPlayer(player.id);
 
       res.send(PlayerStoreNotify, {
         storeType: StoreType.STORE_PACK,
@@ -119,23 +124,24 @@ export class AuthHandler extends KcpHandler {
         itemList: items.map(createItemProto),
       });
 
-      // owned character list
+      // owned character and team list
       const avatars = this.db.avatars.getByPlayer(player.id).map((avatar) => {
         return {
           ...avatar,
+          props: this.db.avatars.getProps(avatar.id),
           fightProps: this.db.avatars.getFightProps(avatar.id),
         };
       });
 
       const teams = this.db.avatars.getTeamsByPlayer(player.id);
-      const activeTeam = teams.find(({ index }) => index === player.active_team) ?? teams[0];
-      const activeAvatarId = activeTeam?.avatar_ids[activeTeam.active_index] ?? activeTeam?.avatar_ids[0];
+      const activeTeam = teams[player.active_team] ?? teams[0];
+      const activeAvatarId = activeTeam?.avatar_ids[activeTeam.active_avatar] ?? activeTeam?.avatar_ids[0];
       const activeAvatar = avatars.find(({ id }) => id === activeAvatarId) ?? avatars[0];
 
       res.send(AvatarDataNotify, {
         avatarList: avatars.map(createAvatarInfoProto),
         avatarTeamMap: createAvatarTeamProtoMap(teams),
-        curAvatarTeamId: activeTeam?.index ?? 1,
+        curAvatarTeamId: player.active_team,
         chooseAvatarGuid: activeAvatar ? BigInt(activeAvatar.id) : 0n,
         ownedFlycloakList: player.flycloak_rids,
         ownedCostumeList: player.costume_rids,
@@ -143,21 +149,22 @@ export class AuthHandler extends KcpHandler {
 
       // begin enter scene
       res.send(PlayerEnterSceneNotify, {
-        sceneId: 3,
+        sceneId: player.scene_rid,
         pos: {
-          x: 2527.529052734375,
-          y: 215.549072265625,
-          z: -1287.1180419921875,
+          x: player.pos_x,
+          y: player.pos_y,
+          z: player.pos_z,
         },
-        sceneBeginTime: 1650278548732n,
+        sceneBeginTime: BigInt(executor.clock.now() >>> 0),
         type: EnterType.ENTER_SELF,
-        targetUid: 6064,
-        enterSceneToken: 1000,
+        targetUid: player.id,
+        enterSceneToken: this.db.players.nextSceneEnterToken(player.id),
         isFirstLoginEnterScene: true,
+        // TODO:
         sceneTagIdList: [102, 107, 113, 117, 125, 134, 139, 141],
-        enterReason: 1,
-        worldType: 1,
-        sceneTransaction: "3-648582960-1650278548-67458",
+        enterReason: EnterReasons.Login,
+        worldLevel: player.world_level,
+        sceneTransaction: `3-${player.id}-${executor.clock.now() >>> 0}-${(Math.random() * 100000) >>> 0}`,
       });
 
       res.send(PlayerLoginRsp, {
