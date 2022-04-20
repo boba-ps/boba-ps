@@ -44,7 +44,7 @@ new SystemExecutor()
   .register(
     new KcpServer(config, ec2b)
       .register(new PingHandler())
-      .register(new AuthHandler())
+      .register(new AuthHandler(db))
       .register(new SceneHandler())
       .register(new SocialHandler())
       .register(new ShopHandler())
