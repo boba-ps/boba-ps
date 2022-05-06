@@ -1,6 +1,6 @@
 # BobaPS-Rewrite
 
-BobaPS is an experimental Genshin Private Server written in TypeScript.
+BobaPS is an experimental server reimplementation for a certain anime game written in TypeScript.
 
 ## Documentation
 
