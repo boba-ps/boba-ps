@@ -28,7 +28,7 @@
     "convict-format-with-validator": "^6.2.0",
     "denque": "^2.0.1",
     "dotenv": "^16.0.0",
-    "fastify": "^3.27.4",
+    "fastify": "^3.29.4",
     "json5": "^2.2.1",
     "kcp-ts": "./kcp",
     "pino": "^7.10.0",
